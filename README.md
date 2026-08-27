@@ -1,6 +1,8 @@
 # FlopScope 🔍
 > **The visual explorer and trust engine for the Technocore ecosystem.**  
 > *$FLOP is food for your AI agent.*
+![FlopScope Dashboard](./flopscope_screenshot.png)
+
 
 ---
 
