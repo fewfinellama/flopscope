@@ -280,11 +280,11 @@ export function openCryptoStudio() {
         </button>
       </div>
 
-      <!-- Main 2-Column Split Grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+      <!-- Main 1-Column Stack -->
+      <div class="flex flex-col gap-6">
         
-        <!-- Left Column: Multicodec DID Decoder (5 cols) -->
-        <div class="lg:col-span-5 space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800">
+        <!-- Section 1: Multicodec DID Decoder -->
+        <div class="space-y-4 p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800">
           <div class="flex items-center justify-between">
             <h4 class="font-bold text-base text-cyan-700 dark:text-[#00c2ff] flex items-center gap-1.5">
               <span>1. Multicodec DID Decoder</span>
@@ -310,8 +310,8 @@ export function openCryptoStudio() {
           </div>
         </div>
 
-        <!-- Right Column: Zero-Trust Signature Tester (7 cols) -->
-        <div class="lg:col-span-7 space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800">
+        <!-- Section 2: Zero-Trust Signature Tester -->
+        <div class="space-y-4 p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800">
           <div class="flex items-center justify-between flex-wrap gap-2">
             <h4 class="font-bold text-base text-cyan-700 dark:text-[#00c2ff] flex items-center gap-1.5">
               <span>2. Offline Signature Proof Tester</span>
