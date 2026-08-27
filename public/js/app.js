@@ -13,7 +13,8 @@ import {
   fetchRoomsList, 
   loadOlderHistory, 
   renderMessagesFeed, 
-  renderRoomsList 
+  renderRoomsList,
+  updateRoomHeaderInfo
 } from './api.js';
 import { 
   openCryptoStudio, 
