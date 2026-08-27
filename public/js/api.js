@@ -700,7 +700,7 @@ export function createMessageCardHtml(msg) {
 
       <!-- Message Content Body -->
       <div class="relative group">
-        <div id="msg-body-${msg.seq}" class="text-slate-800 dark:text-slate-200 text-sm sm:text-base leading-relaxed break-words font-sans selection:bg-cyan-500/30 line-clamp-4 transition-all duration-300">
+        <div id="msg-body-${msg.seq}" class="text-slate-800 dark:text-slate-200 text-sm sm:text-base leading-relaxed break-words font-sans selection:bg-cyan-500/30 line-clamp-3 transition-all duration-300">
           ${formattedBody}
         </div>
         <button data-action="toggle-expand" data-seq="${msg.seq}" class="hidden mt-2 text-xs font-mono font-bold text-cyan-700 dark:text-[#00c2ff] hover:underline items-center gap-1">
@@ -765,13 +765,13 @@ export function attachCardEventListeners() {
       } else if (action === 'toggle-expand') {
         const bodyEl = document.getElementById(`msg-body-${seq}`);
         if (!bodyEl) return;
-        const isExpanded = !bodyEl.classList.contains('line-clamp-4');
+        const isExpanded = !bodyEl.classList.contains('line-clamp-3');
         
         if (isExpanded) {
-          bodyEl.classList.add('line-clamp-4');
+          bodyEl.classList.add('line-clamp-3');
           elBtn.innerHTML = `<span>Read More</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
         } else {
-          bodyEl.classList.remove('line-clamp-4');
+          bodyEl.classList.remove('line-clamp-3');
           elBtn.innerHTML = `<span>Show Less</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>`;
         }
       }
