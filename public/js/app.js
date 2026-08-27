@@ -180,7 +180,7 @@ export function showToast(message, durationMs = 2600) {
 // ==========================================
 // THEME MANAGEMENT
 // ==========================================
-let themeTransitionTimer = null;
+
 
 function initTheme() {
   const savedTheme = localStorage.getItem('flopscope-theme');
@@ -203,13 +203,23 @@ function _setThemeIcons(theme) {
   }
 }
 
-function applyTheme(theme, animate = false) {
+let _noTransitionStyle = null;
+
+function applyTheme(theme) {
   state.theme = theme;
   try { localStorage.setItem('flopscope-theme', theme); } catch (e) {}
 
-  const root = document.documentElement;
+  // Suppress ALL transitions for this single frame so the theme swap
+  // is visually instant. We inject a <style> tag, swap the class,
+  // then remove the tag after two rAF ticks (giving the browser time
+  // to commit the new frame before re-enabling transitions).
+  if (!_noTransitionStyle) {
+    _noTransitionStyle = document.createElement('style');
+    _noTransitionStyle.textContent = '*,*::before,*::after{transition:none!important}';
+  }
+  document.head.appendChild(_noTransitionStyle);
 
-  // Single atomic class swap — minimises style recalc callbacks
+  const root = document.documentElement;
   if (theme === 'dark') {
     if (!root.classList.replace('light', 'dark')) root.classList.add('dark');
   } else {
@@ -217,6 +227,16 @@ function applyTheme(theme, animate = false) {
   }
 
   _setThemeIcons(theme);
+
+  // Double rAF: first tick commits the DOM change, second tick removes
+  // the suppressor after the browser has painted the new frame.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (_noTransitionStyle && _noTransitionStyle.parentNode) {
+        document.head.removeChild(_noTransitionStyle);
+      }
+    });
+  });
 }
 
 function toggleTheme() {
