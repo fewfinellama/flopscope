@@ -313,10 +313,10 @@ export function openCryptoStudio() {
         <!-- Right Column: Zero-Trust Signature Tester (7 cols) -->
         <div class="lg:col-span-7 space-y-3 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800">
           <div class="flex items-center justify-between flex-wrap gap-2">
-            <h4 class="font-bold text-sm text-cyan-400 flex items-center gap-1.5">
+            <h4 class="font-bold text-sm text-cyan-700 dark:text-[#00c2ff] flex items-center gap-1.5">
               <span>2. Offline Signature Proof Tester</span>
             </h4>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-950/60 text-cyan-300 border border-cyan-800/60">Noble Ed25519</span>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/60">Noble Ed25519</span>
           </div>
           <p class="text-slate-500 dark:text-slate-400 text-xs font-sans leading-relaxed">
             Mathematically verify <code class="text-cyan-300">room|nonce|text</code> against an Ed25519 signature in browser memory.
@@ -348,7 +348,7 @@ export function openCryptoStudio() {
             <input type="text" id="studio-test-sig" placeholder="64-byte Ed25519 signature string" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" />
           </div>
 
-          <button id="studio-run-verify-btn" class="w-full py-2.5 bg-cyan-500 hover:bg-cyan-400 active:scale-[0.99] text-slate-950 font-bold rounded-xl text-xs font-mono transition-all flex items-center justify-center gap-2">
+          <button id="studio-run-verify-btn" class="w-full py-2.5 bg-[#00c2ff] hover:bg-[#00b4d8] active:scale-[0.99] text-slate-950 font-bold rounded-xl text-xs font-mono transition-all flex items-center justify-center gap-2">
             <svg id="studio-btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
             </svg>
@@ -386,11 +386,11 @@ export function openCryptoStudio() {
         <div class="flex items-center gap-3">
           ${identicon}
           <div>
-            <div class="text-cyan-400 font-bold text-xs flex items-center gap-1">
+            <div class="text-cyan-700 dark:text-cyan-400 font-bold text-xs flex items-center gap-1">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
               <span>Valid Ed25519 Multicodec Key</span>
             </div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400">Prefix: <code class="text-cyan-300">0xed01</code> (ed25519-pub) · 32 bytes</div>
+            <div class="text-[11px] text-slate-500 dark:text-slate-400">Prefix: <code class="text-cyan-700 dark:text-cyan-300">0xed01</code> (ed25519-pub) · 32 bytes</div>
           </div>
         </div>
         <div class="pt-2 border-t border-slate-200 dark:border-slate-800/80">
@@ -401,7 +401,7 @@ export function openCryptoStudio() {
     } catch (e) {
       didOutput.classList.remove('hidden');
       didOutput.innerHTML = `
-        <div class="text-rose-400 font-bold flex items-center gap-1.5">
+        <div class="text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
           <span>Invalid DID: ${escapeHtml(e.message)}</span>
         </div>
@@ -429,9 +429,9 @@ export function openCryptoStudio() {
     btnIcon.outerHTML = `<div id="studio-btn-icon" class="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>`;
 
     resultDiv.classList.remove('hidden');
-    resultDiv.className = 'p-3.5 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200 dark:border-cyan-800 text-cyan-300 flex items-center gap-2';
+    resultDiv.className = 'p-3.5 rounded-xl bg-cyan-50 dark:bg-cyan-950/60 border border-cyan-200 dark:border-cyan-800 text-cyan-700 dark:text-cyan-300 flex items-center gap-2';
     resultDiv.innerHTML = `
-      <div class="w-3.5 h-3.5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
+      <div class="w-3.5 h-3.5 border-2 border-cyan-500 dark:border-cyan-400 border-t-transparent rounded-full animate-spin flex-shrink-0"></div>
       <span>Executing Noble-Ed25519 Curve25519 verification in browser memory...</span>
     `;
 
@@ -441,31 +441,31 @@ export function openCryptoStudio() {
       const res = await verifyTechnocoreMessage(room, nonce, text, did, sig);
       
       if (res.valid) {
-        resultDiv.className = 'p-3.5 rounded-xl bg-cyan-950/80 border border-cyan-800 text-cyan-300 space-y-1.5 animate-fadeIn';
+        resultDiv.className = 'p-3.5 rounded-xl bg-cyan-50 dark:bg-cyan-950/80 border border-cyan-200 dark:border-cyan-800 text-cyan-800 dark:text-cyan-300 space-y-1.5 animate-fadeIn';
         resultDiv.innerHTML = `
-          <div class="font-bold text-sm flex items-center gap-2 text-cyan-300">
-            <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <div class="font-bold text-sm flex items-center gap-2 text-cyan-700 dark:text-cyan-300">
+            <svg class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <span>Signature Verified Successfully!</span>
           </div>
-          <div class="text-[11px] text-slate-700 dark:text-slate-300 pt-1 border-t border-cyan-900/60">
+          <div class="text-[11px] text-slate-700 dark:text-slate-300 pt-1 border-t border-cyan-200 dark:border-cyan-900/60">
             <span class="text-slate-500 dark:text-slate-400">Reconstructed Payload:</span> <code class="text-slate-900 dark:text-white break-all">${escapeHtml(res.payload || '')}</code>
           </div>
           <div class="text-[11px] text-slate-700 dark:text-slate-300">
-            <span class="text-slate-500 dark:text-slate-400">Public Key Hex:</span> <code class="text-cyan-400 break-all">${res.publicKeyHex || ''}</code>
+            <span class="text-slate-500 dark:text-slate-400">Public Key Hex:</span> <code class="text-cyan-700 dark:text-cyan-400 break-all">${res.publicKeyHex || ''}</code>
           </div>
         `;
       } else {
-        resultDiv.className = 'p-3.5 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 space-y-1.5 animate-fadeIn';
+        resultDiv.className = 'p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 space-y-1.5 animate-fadeIn';
         resultDiv.innerHTML = `
-          <div class="font-bold text-sm flex items-center gap-2 text-rose-300">
-            <svg class="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          <div class="font-bold text-sm flex items-center gap-2 text-rose-700 dark:text-rose-300">
+            <svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             <span>Signature Verification Failed</span>
           </div>
-          <div class="text-xs text-rose-200 pt-1 border-t border-rose-900/60">${escapeHtml(res.error || 'Signature does not match payload')}</div>
+          <div class="text-xs text-rose-600 dark:text-rose-200 pt-1 border-t border-rose-200 dark:border-rose-900/60">${escapeHtml(res.error || 'Signature does not match payload')}</div>
         `;
       }
     } catch (err) {
-      resultDiv.className = 'p-3.5 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300 animate-fadeIn';
+      resultDiv.className = 'p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 animate-fadeIn';
       resultDiv.innerHTML = `<div class="font-bold text-xs">Error: ${escapeHtml(err.message)}</div>`;
     } finally {
       // 3. Restore Button State
