@@ -217,7 +217,7 @@ export function openProofInspector(msg) {
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
           <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Payload String: room|nonce|text</label>
-          <span class="text-slate-500 dark:text-slate-400 dark:text-slate-500 font-bold text-[10px]">${payloadBytes.length} UTF-8 Bytes</span>
+          <span class="text-slate-500 dark:text-slate-400 font-bold text-[10px]">${payloadBytes.length} UTF-8 Bytes</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 font-medium break-all select-all max-h-36 overflow-y-auto leading-relaxed">
           ${escapeHtml(payloadStr)}
@@ -525,7 +525,7 @@ export function openRawJsonModal() {
         </button>
       </div>
 
-      <pre class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-800 text-slate-800 dark:text-slate-200 overflow-x-auto max-h-[60vh] select-all leading-relaxed">${escapeHtml(jsonStr)}</pre>
+      <pre class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 overflow-x-auto max-h-[60vh] select-all leading-relaxed">${escapeHtml(jsonStr)}</pre>
     </div>
   `;
 

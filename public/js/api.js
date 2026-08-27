@@ -260,7 +260,7 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
 
   if (isInitial && el.messagesContainer) {
     el.messagesContainer.innerHTML = `
-      <div class="animate-pulse glass-panel rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800/90 flex flex-col gap-4">
+      <div class="animate-pulse glass-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4">
         <div class="flex justify-between items-start">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800"></div>
@@ -277,7 +277,7 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
           <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-4/6"></div>
         </div>
       </div>
-      <div class="animate-pulse glass-panel rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800/90 flex flex-col gap-4" style="animation-delay: 150ms">
+      <div class="animate-pulse glass-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-4" style="animation-delay: 150ms">
         <div class="flex justify-between items-start">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800"></div>
@@ -575,7 +575,7 @@ export function renderMessagesFeed() {
 
   if (filtered.length === 0) {
     html += `
-      <div class="text-center py-16 px-4 rounded-2xl glass-panel border border-slate-200 dark:border-slate-800 text-slate-400 font-mono text-sm space-y-2">
+      <div class="text-center py-16 px-4 rounded-2xl glass-panel text-slate-400 font-mono text-sm space-y-2">
         <svg class="w-8 h-8 text-slate-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
         </svg>
@@ -663,7 +663,7 @@ export function createMessageCardHtml(msg) {
   const formattedBody = formatMessageBody(msg.rawText || msg.text || '');
 
   return `
-    <div id="msg-${msg.seq}" class="message-card glass-panel rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800/90 flex flex-col gap-3">
+    <div id="msg-${msg.seq}" class="message-card glass-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
       
       <!-- Top Message Header Bar -->
       <div class="flex items-start justify-between gap-3 flex-wrap">
