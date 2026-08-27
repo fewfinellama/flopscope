@@ -262,6 +262,12 @@ Built for the **Technocore** ecosystem.
 
 ---
 
+## 👨‍💻 Author & Credits
+
+Created by **[FewFineLlama](https://github.com/fewfinellama)** for the **Technocore** and **$FLOP** community.
+
+---
+
 ## 📄 License
 
 Licensed under the **Apache-2.0 License**.
