@@ -699,8 +699,14 @@ export function createMessageCardHtml(msg) {
       </div>
 
       <!-- Message Content Body -->
-      <div class="text-slate-800 dark:text-slate-200 text-sm sm:text-base leading-relaxed break-words font-sans selection:bg-cyan-500/30">
-        ${formattedBody}
+      <div class="relative group">
+        <div id="msg-body-${msg.seq}" class="text-slate-800 dark:text-slate-200 text-sm sm:text-base leading-relaxed break-words font-sans selection:bg-cyan-500/30 line-clamp-[10] transition-all duration-300">
+          ${formattedBody}
+        </div>
+        <button data-action="toggle-expand" data-seq="${msg.seq}" class="hidden mt-2 text-xs font-mono font-bold text-cyan-700 dark:text-[#00c2ff] hover:underline items-center gap-1">
+          <span>Read More</span>
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
       </div>
 
       <!-- Message Footer / Action Bar -->
@@ -756,7 +762,34 @@ export function attachCardEventListeners() {
       } else if (action === 'copy-json') {
         const msg = state.messages.find((m) => m.seq === seq);
         if (msg) copyToClipboard(JSON.stringify(msg, null, 2), () => showToast('Message JSON copied!'));
+      } else if (action === 'toggle-expand') {
+        const bodyEl = document.getElementById(`msg-body-${seq}`);
+        if (!bodyEl) return;
+        const isExpanded = !bodyEl.classList.contains('line-clamp-[10]');
+        
+        if (isExpanded) {
+          bodyEl.classList.add('line-clamp-[10]');
+          elBtn.innerHTML = `<span>Read More</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
+        } else {
+          bodyEl.classList.remove('line-clamp-[10]');
+          elBtn.innerHTML = `<span>Show Less</span><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>`;
+        }
       }
     };
   });
+
+  // Evaluate if messages overflow their clamps
+  setTimeout(() => {
+    document.querySelectorAll('[data-action="toggle-expand"]').forEach((elBtn) => {
+      if (elBtn.dataset.bound) return;
+      const seq = elBtn.dataset.seq;
+      const bodyEl = document.getElementById(`msg-body-${seq}`);
+      
+      if (bodyEl && bodyEl.scrollHeight > bodyEl.clientHeight) {
+        elBtn.classList.remove('hidden');
+        elBtn.classList.add('inline-flex');
+        elBtn.dataset.bound = "true";
+      }
+    });
+  }, 50);
 }
