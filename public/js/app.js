@@ -209,14 +209,7 @@ function applyTheme(theme, animate = false) {
 
   const root = document.documentElement;
 
-  if (animate) {
-    root.classList.add('theme-transition');
-    if (themeTransitionTimer) clearTimeout(themeTransitionTimer);
-    themeTransitionTimer = setTimeout(() => root.classList.remove('theme-transition'), 250);
-  }
-
-  // Swap dark/light together in a single classList.replace to minimise
-  // the number of MutationObserver callbacks the Tailwind CDN fires.
+  // Single atomic class swap — minimises style recalc callbacks
   if (theme === 'dark') {
     if (!root.classList.replace('light', 'dark')) root.classList.add('dark');
   } else {
@@ -227,7 +220,7 @@ function applyTheme(theme, animate = false) {
 }
 
 function toggleTheme() {
-  applyTheme(state.theme === 'dark' ? 'light' : 'dark', true);
+  applyTheme(state.theme === 'dark' ? 'light' : 'dark');
 }
 
 // ==========================================
