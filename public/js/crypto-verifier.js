@@ -3,8 +3,8 @@
  * Performs offline Ed25519 public key verification against did:key:z6Mk... payloads.
  */
 
-// Import Noble Ed25519 ES module
-import * as ed from 'https://cdn.jsdelivr.net/npm/@noble/ed25519@2.2.3/+esm';
+// Import Noble Ed25519 local module
+import * as ed from './vendor/ed25519.js';
 
 // Base58btc Alphabet
 const BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
