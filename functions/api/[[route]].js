@@ -1,7 +1,7 @@
 /**
  * Cloudflare Pages Function: /api/*
  * Runs full-speed on Cloudflare Edge V8 Isolates with 0ms cold starts.
- * Provides 100% API parity with Node.js Express server.
+ * Provides 100% API parity with Node.js Express server and Cloudflare D1 integration.
  */
 
 // In-Memory Edge Cache per isolate
@@ -53,6 +53,7 @@ export async function onRequest(context) {
           status: 'ok',
           platform: 'cloudflare-pages-edge',
           upstream: upstreamHost,
+          d1DatabaseBound: Boolean(env.DB),
           timestamp: new Date().toISOString(),
         }),
         { headers }
@@ -80,7 +81,7 @@ export async function onRequest(context) {
       }
 
       const upstreamRes = await fetch(`${upstreamHost}/rooms`, {
-        headers: { 'Accept': 'application/json', 'User-Agent': 'FlopscopeEdge/1.0' },
+        headers: { 'Accept': 'text/plain', 'User-Agent': 'FlopscopeEdge/1.0' },
       });
 
       if (!upstreamRes.ok) {
@@ -90,17 +91,27 @@ export async function onRequest(context) {
         );
       }
 
-      const rawJson = await upstreamRes.json();
-      const rawRooms = Array.isArray(rawJson.rooms) ? rawJson.rooms : [];
-      const rooms = rawRooms.map((r) => ({
-        name: typeof r === 'string' ? r : r.name || 'lobby',
-        topic: r.topic || '',
-        seq: r.seq || 0,
-        age: r.age || 'active',
-        isOwned: typeof r === 'string' ? r.startsWith('d-') : (r.name || '').startsWith('d-'),
-        isMailbox: typeof r === 'string' ? r.startsWith('mb-') : (r.name || '').startsWith('mb-'),
-        isPrivate: typeof r === 'string' ? r.startsWith('p-') : (r.name || '').startsWith('p-'),
-      }));
+      const rawText = await upstreamRes.text();
+      const lineRegex = /^\/r\/([a-zA-Z0-9_-]+)\s+seq\s+(\d+)\s+([^\s]+)\s+([\d\w\s]+?ago)(?:\s+·\s*(.*))?$/;
+      const rooms = [];
+
+      for (const line of rawText.split('\n')) {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith('#')) continue;
+        const match = trimmed.match(lineRegex);
+        if (match) {
+          rooms.push({
+            name: match[1],
+            seq: parseInt(match[2], 10),
+            size: match[3],
+            age: match[4].trim(),
+            topic: match[5] ? match[5].trim() : '',
+            isOwned: match[1].startsWith('d-'),
+            isMailbox: match[1].startsWith('mb-'),
+            isPrivate: match[1].startsWith('p-'),
+          });
+        }
+      }
 
       setCache(cacheKey, rooms);
 
