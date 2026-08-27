@@ -260,7 +260,7 @@ export function openCryptoStudio() {
   if (!el.cryptoStudioOverlay || !el.cryptoStudioContent) return;
 
   el.cryptoStudioContent.innerHTML = `
-    <div class="p-5 sm:p-6 space-y-4 font-mono text-base overflow-y-auto max-h-[90vh]">
+    <div class="p-5 sm:p-6 space-y-4 font-mono text-base ">
       
       <!-- Studio Header -->
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
