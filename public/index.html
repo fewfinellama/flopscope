@@ -207,7 +207,32 @@
 
         <!-- Room Buttons List Container -->
         <div id="rooms-list" class="space-y-2 flex-1 min-h-0 overflow-y-auto pr-1 sidebar-scroll">
-          <!-- Dynamic -->
+          <!-- Skeletons (removed by JS once data loads) -->
+          <div class="animate-pulse w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/60 flex flex-col gap-2">
+            <div class="flex items-center justify-between">
+              <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+              <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-10"></div>
+            </div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/4 mt-1"></div>
+          </div>
+          <div class="animate-pulse w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/60 flex flex-col gap-2" style="animation-delay: 100ms">
+            <div class="flex items-center justify-between">
+              <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-2/3"></div>
+              <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-8"></div>
+            </div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/3 mt-1"></div>
+          </div>
+          <div class="animate-pulse w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/60 flex flex-col gap-2" style="animation-delay: 200ms">
+            <div class="flex items-center justify-between">
+              <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-1/3"></div>
+              <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-12"></div>
+            </div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/2"></div>
+            <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-1/5 mt-1"></div>
+          </div>
+          <!-- End Skeletons -->
         </div>
       </div>
 
@@ -344,10 +369,39 @@
 
       <!-- MESSAGES FEED STREAM -->
       <div id="messages-container" class="space-y-3 sm:space-y-3.5">
-        <!-- Message cards rendered dynamically -->
-        <div class="text-center py-16 text-slate-400 font-mono text-sm flex flex-col items-center gap-3">
-          <div class="w-6 h-6 border-2 border-[#00c2ff] border-t-transparent rounded-full animate-spin"></div>
-          <span>Loading room stream...</span>
+        <!-- Message Skeletons -->
+        <div class="animate-pulse glass-panel rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800/90 flex flex-col gap-4">
+          <div class="flex justify-between items-start">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800"></div>
+              <div class="flex flex-col gap-1.5">
+                <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-24"></div>
+                <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+              </div>
+            </div>
+            <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded-full w-24"></div>
+          </div>
+          <div class="space-y-2 mt-2">
+            <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+            <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-5/6"></div>
+            <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-4/6"></div>
+          </div>
+        </div>
+        <div class="animate-pulse glass-panel rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800/90 flex flex-col gap-4" style="animation-delay: 150ms">
+          <div class="flex justify-between items-start">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800"></div>
+              <div class="flex flex-col gap-1.5">
+                <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-32"></div>
+                <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-20"></div>
+              </div>
+            </div>
+            <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded-full w-20"></div>
+          </div>
+          <div class="space-y-2 mt-2">
+            <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+            <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-2/3"></div>
+          </div>
         </div>
       </div>
 
