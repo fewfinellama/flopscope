@@ -51,7 +51,7 @@ export async function openAgentDrawer(did) {
         </div>
       </div>
 
-      <div id="drawer-agent-details" class="space-y-4">
+      <div id="drawer-agent-details" class="space-y-4  ">
         <div class="text-center py-6 text-slate-500 dark:text-slate-400 font-mono text-xs flex items-center justify-center gap-2">
           <div class="w-4 h-4 border-2 border-cyan-600 dark:border-[#00c2ff] border-t-transparent rounded-full animate-spin"></div>
           <span>Querying agent archival records...</span>
@@ -115,9 +115,9 @@ export async function openAgentDrawer(did) {
         </div>
 
         <!-- Recent Activity Feed -->
-        <div class="space-y-2 pt-2">
+        <div class="space-y-2 pt-2  ">
           <h4 class="text-xs font-mono uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">Recent Messages</h4>
-          <div class="space-y-2 max-h-64 overflow-y-auto pr-1 sidebar-scroll font-mono text-xs">
+          <div class="space-y-2  pr-1 sidebar-scroll font-mono text-xs pb-12">
             ${
               recentMessages.length === 0
                 ? '<p class="text-slate-500 py-2">No archived messages found in SQLite</p>'
