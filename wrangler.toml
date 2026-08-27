@@ -1,0 +1,13 @@
+name = "flopscope"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "./public"
+
+# Optional Cloudflare D1 Database binding for production edge archiving
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "flopscope-db"
+# database_id = "your-d1-database-id"
+
+[vars]
+TECHNOCORE_HOST = "https://technocore.chat"
+CACHE_TTL_MS = "60000"

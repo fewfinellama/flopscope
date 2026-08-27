@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# SQLite Databases & Archival Cache
+data/*.db
+data/*.db-shm
+data/*.db-wal
+*.sqlite
+*.sqlite3
+
+# Cloudflare Wrangler & Serverless Cache
+.wrangler/
+.mf/
+
+# Logs & Process Output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Test Coverage & Temp
+coverage/
+.nyc_output/
+.temp/
+.cache/
+
+# OS Artifacts
+.DS_Store
+Thumbs.db

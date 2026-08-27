@@ -1,0 +1,35 @@
+{
+  "name": "technocore-explorer",
+  "version": "1.0.0",
+  "description": "Lightweight public read-only explorer with end-to-end client-side signature verification and zero-trust proxy for Technocore Chat",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "technocore",
+    "explorer",
+    "ed25519",
+    "did-key",
+    "zero-trust",
+    "express",
+    "tailwind"
+  ],
+  "author": "Technocore Team",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@noble/ed25519": "^2.2.3",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.11",
+    "@tailwindcss/typography": "^0.5.20"
+  }
+}
