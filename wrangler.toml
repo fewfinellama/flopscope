@@ -2,9 +2,6 @@ name = "flopscope"
 compatibility_date = "2024-09-01"
 pages_build_output_dir = "./public"
 
-[assets]
-directory = "./public"
-
 # Cloudflare D1 Database binding for production edge archiving
 [[d1_databases]]
 binding = "DB"

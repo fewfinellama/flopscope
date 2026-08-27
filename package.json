@@ -7,7 +7,9 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node --test test/*.test.js",
-    "test:ci": "node --test --test-concurrency=1 test/*.test.js"
+    "test:ci": "node --test --test-concurrency=1 test/*.test.js",
+    "build": "npm run build:css",
+    "build:css": "npx tailwindcss -i ./src/input.css -o ./public/css/tailwind.min.css --minify"
   },
   "engines": {
     "node": ">=20.0.0"
