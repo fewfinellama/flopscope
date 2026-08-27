@@ -25,7 +25,7 @@ export async function openAgentDrawer(did) {
   el.agentDrawerContent.innerHTML = `
     <div class="p-6 space-y-6 text-slate-800 dark:text-slate-200">
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
-        <h3 class="text-xl font-bold font-mono text-slate-900 dark:text-white flex items-center gap-2">
+        <h3 class="text-lg font-bold font-mono text-slate-900 dark:text-white flex items-center gap-2">
           <span>Agent Profile</span>
         </h3>
         <button id="agent-drawer-close" class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-2 transition-colors">
@@ -36,14 +36,14 @@ export async function openAgentDrawer(did) {
       <div class="flex items-center gap-4">
         ${generateIdenticonSvg(did, 64)}
         <div class="min-w-0 flex-1 space-y-1">
-          <p class="text-sm font-mono font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ed25519 DID Identifier</p>
-          <p class="text-sm font-mono font-bold text-cyan-700 dark:text-[#00c2ff] break-all">${escapeHtml(did)}</p>
+          <p class="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ed25519 DID Identifier</p>
+          <p class="text-xs font-mono font-bold text-cyan-700 dark:text-[#00c2ff] break-all">${escapeHtml(did)}</p>
           <div class="flex items-center gap-2 mt-2">
-            <button id="drawer-copy-did-btn" class="btn-interactive px-3 py-1.5 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/80 rounded-xl text-sm font-mono font-bold flex items-center gap-1.5 transition-colors">
+            <button id="drawer-copy-did-btn" class="btn-interactive px-3 py-1.5 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/80 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
               <span>Copy</span>
             </button>
-            <button id="drawer-filter-did-btn" class="btn-interactive px-3 py-1.5 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-mono font-bold flex items-center gap-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+            <button id="drawer-filter-did-btn" class="btn-interactive px-3 py-1.5 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
               <span>Filter Feed</span>
             </button>
@@ -52,7 +52,7 @@ export async function openAgentDrawer(did) {
       </div>
 
       <div id="drawer-agent-details" class="space-y-4">
-        <div class="text-center py-6 text-slate-500 dark:text-slate-400 font-mono text-sm flex items-center justify-center gap-2">
+        <div class="text-center py-6 text-slate-500 dark:text-slate-400 font-mono text-xs flex items-center justify-center gap-2">
           <div class="w-4 h-4 border-2 border-cyan-600 dark:border-[#00c2ff] border-t-transparent rounded-full animate-spin"></div>
           <span>Querying agent archival records...</span>
         </div>
@@ -97,37 +97,37 @@ export async function openAgentDrawer(did) {
     if (detailsEl) {
       detailsEl.innerHTML = `
         <!-- Public Key Breakdown -->
-        <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1.5 font-mono text-sm">
-          <span class="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-sm">32-Byte Public Key (Hex)</span>
+        <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1.5 font-mono text-xs">
+          <span class="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-xs">32-Byte Public Key (Hex)</span>
           <p class="text-slate-800 dark:text-slate-200 font-medium break-all select-all">${pubKeyHex}</p>
         </div>
 
         <!-- Lifetime Stats -->
         <div class="grid grid-cols-2 gap-3">
           <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80">
-            <span class="text-slate-500 dark:text-slate-400 text-sm font-mono font-semibold uppercase tracking-wider">Archived Msgs</span>
-            <p class="text-2xl font-bold font-mono text-slate-900 dark:text-white mt-1">${(stats.total_messages || recentMessages.length).toLocaleString()}</p>
+            <span class="text-slate-500 dark:text-slate-400 text-xs font-mono font-semibold uppercase tracking-wider">Archived Msgs</span>
+            <p class="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">${(stats.total_messages || recentMessages.length).toLocaleString()}</p>
           </div>
           <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80">
-            <span class="text-slate-500 dark:text-slate-400 text-sm font-mono font-semibold uppercase tracking-wider">Rooms Visited</span>
-            <p class="text-2xl font-bold font-mono text-cyan-700 dark:text-[#00c2ff] mt-1">${stats.rooms_count || 1}</p>
+            <span class="text-slate-500 dark:text-slate-400 text-xs font-mono font-semibold uppercase tracking-wider">Rooms Visited</span>
+            <p class="text-xl font-bold font-mono text-cyan-700 dark:text-[#00c2ff] mt-1">${stats.rooms_count || 1}</p>
           </div>
         </div>
 
         <!-- Recent Activity Feed -->
         <div class="space-y-2 pt-2">
-          <h4 class="text-sm font-mono uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">Recent Messages</h4>
-          <div class="space-y-2 max-h-64 overflow-y-auto pr-1 sidebar-scroll font-mono text-sm">
+          <h4 class="text-xs font-mono uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">Recent Messages</h4>
+          <div class="space-y-2 max-h-64 overflow-y-auto pr-1 sidebar-scroll font-mono text-xs">
             ${
               recentMessages.length === 0
                 ? '<p class="text-slate-500 py-2">No archived messages found in SQLite</p>'
                 : recentMessages.map((m) => `
                     <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1.5">
-                      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-sm font-semibold">
+                      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
                         <span class="text-cyan-700 dark:text-[#00c2ff]">/r/${escapeHtml(m.room)}</span>
                         <span>#${m.seq} · ${formatRelativeTime(m.ts)}</span>
                       </div>
-                      <p class="text-slate-700 dark:text-slate-300 font-sans text-sm line-clamp-2">${escapeHtml(m.rawText || m.text)}</p>
+                      <p class="text-slate-700 dark:text-slate-300 font-sans text-xs line-clamp-2">${escapeHtml(m.rawText || m.text)}</p>
                     </div>
                   `).join('')
             }
@@ -170,7 +170,7 @@ export function openProofInspector(msg) {
   const verif = state.verificationCache.get(cacheKey) || { valid: true };
 
   el.modalContainer.innerHTML = `
-    <div class="p-5 sm:p-6 space-y-5 font-mono text-base text-slate-800 dark:text-slate-200">
+    <div class="p-5 sm:p-6 space-y-5 font-mono text-sm text-slate-800 dark:text-slate-200">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -178,7 +178,7 @@ export function openProofInspector(msg) {
           <svg class="w-5 h-5 text-cyan-600 dark:text-[#00c2ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
-          <h3 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">Cryptographic Proof Inspector</h3>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">Cryptographic Proof Inspector</h3>
         </div>
         <button id="modal-close-btn" class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-1 transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -193,21 +193,21 @@ export function openProofInspector(msg) {
       } flex items-center justify-between">
         <div class="flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full ${verif.valid ? 'bg-cyan-500 dark:bg-cyan-400' : 'bg-rose-500 dark:bg-rose-400'}"></span>
-          <span class="font-bold text-base tracking-tight">${verif.valid ? 'Valid Ed25519 Proof' : 'Verification Failed'}</span>
+          <span class="font-bold text-sm tracking-tight">${verif.valid ? 'Valid Ed25519 Proof' : 'Verification Failed'}</span>
         </div>
-        <span class="text-base font-medium opacity-70">Algorithm: Noble Ed25519</span>
+        <span class="text-sm font-medium opacity-70">Algorithm: Noble Ed25519</span>
       </div>
 
       <!-- Sender DID & Public Key -->
       <div class="space-y-1.5">
-        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-sm tracking-wider">Sender DID</label>
+        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Sender DID</label>
         <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-200 font-medium break-all select-all">
           ${escapeHtml(msg.from)}
         </div>
       </div>
 
       <div class="space-y-1.5">
-        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-sm tracking-wider">Decoded 32-Byte Public Key (Hex)</label>
+        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Decoded 32-Byte Public Key (Hex)</label>
         <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-cyan-700 dark:text-cyan-400 font-medium break-all select-all">
           ${pubKeyHex}
         </div>
@@ -216,8 +216,8 @@ export function openProofInspector(msg) {
       <!-- Reconstructed Payload Structure -->
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-sm tracking-wider">Payload String: room|nonce|text</label>
-          <span class="text-slate-500 dark:text-slate-400 font-bold text-sm">${payloadBytes.length} UTF-8 Bytes</span>
+          <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Payload String: room|nonce|text</label>
+          <span class="text-slate-500 dark:text-slate-400 font-bold text-xs">${payloadBytes.length} UTF-8 Bytes</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 font-medium break-all select-all max-h-36 overflow-y-auto leading-relaxed">
           ${escapeHtml(payloadStr)}
@@ -226,13 +226,13 @@ export function openProofInspector(msg) {
 
       <!-- Signature Hex / Base64url -->
       <div class="space-y-1.5">
-        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-sm tracking-wider">Signature (${msg.sig ? msg.sig.length : 0} chars)</label>
+        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Signature (${msg.sig ? msg.sig.length : 0} chars)</label>
         <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-600 dark:text-slate-400 font-medium break-all select-all max-h-24 overflow-y-auto">
           ${escapeHtml(msg.sig || 'Upstream server attestation at write time')}
         </div>
       </div>
 
-      <button id="modal-done-btn" class="w-full py-2.5 bg-[#00c2ff] hover:bg-[#00b4d8] text-slate-950 font-bold rounded-xl text-base font-mono">
+      <button id="modal-done-btn" class="w-full py-2.5 bg-[#00c2ff] hover:bg-[#00b4d8] text-slate-950 font-bold rounded-xl text-sm font-mono">
         Close Inspector
       </button>
 
@@ -260,7 +260,7 @@ export function openCryptoStudio() {
   if (!el.cryptoStudioOverlay || !el.cryptoStudioContent) return;
 
   el.cryptoStudioContent.innerHTML = `
-    <div class="p-5 sm:p-6 space-y-4 font-mono text-base ">
+    <div class="p-5 sm:p-6 space-y-4 font-mono text-sm ">
       
       <!-- Studio Header -->
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -271,8 +271,8 @@ export function openCryptoStudio() {
             </svg>
           </div>
           <div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">Crypto Studio & DID Playground</h3>
-            <p class="text-base text-slate-500 dark:text-slate-400 font-sans">Zero-trust cryptographic decoder and offline Ed25519 verification suite</p>
+            <h3 class="text-base font-bold text-slate-900 dark:text-white leading-tight">Crypto Studio & DID Playground</h3>
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-sans">Zero-trust cryptographic decoder and offline Ed25519 verification suite</p>
           </div>
         </div>
         <button id="studio-close-btn" class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
@@ -286,26 +286,26 @@ export function openCryptoStudio() {
         <!-- Section 1: Multicodec DID Decoder -->
         <div class="space-y-4 p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800">
           <div class="flex items-center justify-between">
-            <h4 class="font-bold text-base text-cyan-700 dark:text-[#00c2ff] flex items-center gap-1.5">
+            <h4 class="font-bold text-sm text-cyan-700 dark:text-[#00c2ff] flex items-center gap-1.5">
               <span>1. Multicodec DID Decoder</span>
             </h4>
-            <span class="text-sm px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/60">Base58btc</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/60">Base58btc</span>
           </div>
-          <p class="text-slate-500 dark:text-slate-400 text-sm font-sans leading-relaxed">
+          <p class="text-slate-500 dark:text-slate-400 text-xs font-sans leading-relaxed">
             Unpack any <code class="text-slate-800 dark:text-slate-200">did:key:z6Mk...</code> string to verify its multicodec prefix (<code class="text-cyan-400">0xed01</code>) and extract the raw 32-byte public key.
           </p>
           
           <div class="space-y-1.5">
-            <label class="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider">Agent DID String</label>
+            <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Agent DID String</label>
             <input
               type="text"
               id="studio-did-input"
               placeholder="did:key:z6Mkq..."
-              class="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-sm font-mono focus:outline-none focus:border-[#00c2ff] transition"
+              class="w-full p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-[#00c2ff] transition"
             />
           </div>
 
-          <div id="studio-did-output" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-sm space-y-2 hidden transition-all">
+          <div id="studio-did-output" class="p-3 rounded-xl bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 text-xs space-y-2 hidden transition-all">
             <!-- Injected via JS -->
           </div>
         </div>
@@ -313,42 +313,42 @@ export function openCryptoStudio() {
         <!-- Section 2: Zero-Trust Signature Tester -->
         <div class="space-y-4 p-5 sm:p-6 rounded-2xl bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800">
           <div class="flex items-center justify-between flex-wrap gap-2">
-            <h4 class="font-bold text-base text-cyan-700 dark:text-[#00c2ff] flex items-center gap-1.5">
+            <h4 class="font-bold text-sm text-cyan-700 dark:text-[#00c2ff] flex items-center gap-1.5">
               <span>2. Offline Signature Proof Tester</span>
             </h4>
-            <span class="text-sm px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/60">Noble Ed25519</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/60">Noble Ed25519</span>
           </div>
-          <p class="text-slate-500 dark:text-slate-400 text-sm font-sans leading-relaxed">
+          <p class="text-slate-500 dark:text-slate-400 text-xs font-sans leading-relaxed">
             Mathematically verify <code class="text-cyan-300">room|nonce|text</code> against an Ed25519 signature in browser memory.
           </p>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
-              <label class="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider">Room Name</label>
-              <input type="text" id="studio-test-room" value="${escapeHtml(state.currentRoom)}" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-sm font-mono focus:outline-none focus:border-cyan-400 transition" />
+              <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Room Name</label>
+              <input type="text" id="studio-test-room" value="${escapeHtml(state.currentRoom)}" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" />
             </div>
             <div>
-              <label class="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nonce</label>
-              <input type="text" id="studio-test-nonce" placeholder="e.g. 1787833384635099858" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-sm font-mono focus:outline-none focus:border-cyan-400 transition" />
+              <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nonce</label>
+              <input type="text" id="studio-test-nonce" placeholder="e.g. 1787833384635099858" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" />
             </div>
           </div>
 
           <div>
-            <label class="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider">Message Text</label>
-            <textarea id="studio-test-text" rows="2" placeholder="Message content..." class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-sm font-mono focus:outline-none focus:border-cyan-400 transition"></textarea>
+            <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Message Text</label>
+            <textarea id="studio-test-text" rows="2" placeholder="Message content..." class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition"></textarea>
           </div>
 
           <div>
-            <label class="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signer DID</label>
-            <input type="text" id="studio-test-did" placeholder="did:key:z6Mk..." class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-sm font-mono focus:outline-none focus:border-cyan-400 transition" />
+            <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signer DID</label>
+            <input type="text" id="studio-test-did" placeholder="did:key:z6Mk..." class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" />
           </div>
 
           <div>
-            <label class="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signature (Hex or Base64url)</label>
-            <input type="text" id="studio-test-sig" placeholder="64-byte Ed25519 signature string" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-sm font-mono focus:outline-none focus:border-cyan-400 transition" />
+            <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signature (Hex or Base64url)</label>
+            <input type="text" id="studio-test-sig" placeholder="64-byte Ed25519 signature string" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" />
           </div>
 
-          <button id="studio-run-verify-btn" class="w-full py-2.5 bg-[#00c2ff] hover:bg-[#00b4d8] active:scale-[0.99] text-slate-950 font-bold rounded-xl text-sm font-mono transition-all flex items-center justify-center gap-2">
+          <button id="studio-run-verify-btn" class="w-full py-2.5 bg-[#00c2ff] hover:bg-[#00b4d8] active:scale-[0.99] text-slate-950 font-bold rounded-xl text-xs font-mono transition-all flex items-center justify-center gap-2">
             <svg id="studio-btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
             </svg>
@@ -386,16 +386,16 @@ export function openCryptoStudio() {
         <div class="flex items-center gap-3">
           ${identicon}
           <div>
-            <div class="text-cyan-700 dark:text-cyan-400 font-bold text-sm flex items-center gap-1">
+            <div class="text-cyan-700 dark:text-cyan-400 font-bold text-xs flex items-center gap-1">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
               <span>Valid Ed25519 Multicodec Key</span>
             </div>
-            <div class="text-base text-slate-500 dark:text-slate-400">Prefix: <code class="text-cyan-700 dark:text-cyan-300">0xed01</code> (ed25519-pub) · 32 bytes</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Prefix: <code class="text-cyan-700 dark:text-cyan-300">0xed01</code> (ed25519-pub) · 32 bytes</div>
           </div>
         </div>
         <div class="pt-2 border-t border-slate-200 dark:border-slate-800/80">
-          <span class="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Public Key Hex</span>
-          <div class="p-2 rounded bg-slate-50 dark:bg-slate-950 text-cyan-700 dark:text-[#00c2ff] text-base break-all select-all font-mono">${hex}</div>
+          <span class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Public Key Hex</span>
+          <div class="p-2 rounded bg-slate-50 dark:bg-slate-950 text-cyan-700 dark:text-[#00c2ff] text-sm break-all select-all font-mono">${hex}</div>
         </div>
       `;
     } catch (e) {
@@ -443,30 +443,30 @@ export function openCryptoStudio() {
       if (res.valid) {
         resultDiv.className = 'p-3.5 rounded-xl bg-cyan-50 dark:bg-cyan-950/80 border border-cyan-200 dark:border-cyan-800 text-cyan-800 dark:text-cyan-300 space-y-1.5 animate-fadeIn';
         resultDiv.innerHTML = `
-          <div class="font-bold text-base flex items-center gap-2 text-cyan-700 dark:text-cyan-300">
+          <div class="font-bold text-sm flex items-center gap-2 text-cyan-700 dark:text-cyan-300">
             <svg class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <span>Signature Verified Successfully!</span>
           </div>
-          <div class="text-base text-slate-700 dark:text-slate-300 pt-1 border-t border-cyan-200 dark:border-cyan-900/60">
+          <div class="text-sm text-slate-700 dark:text-slate-300 pt-1 border-t border-cyan-200 dark:border-cyan-900/60">
             <span class="text-slate-500 dark:text-slate-400">Reconstructed Payload:</span> <code class="text-slate-900 dark:text-white break-all">${escapeHtml(res.payload || '')}</code>
           </div>
-          <div class="text-base text-slate-700 dark:text-slate-300">
+          <div class="text-sm text-slate-700 dark:text-slate-300">
             <span class="text-slate-500 dark:text-slate-400">Public Key Hex:</span> <code class="text-cyan-700 dark:text-cyan-400 break-all">${res.publicKeyHex || ''}</code>
           </div>
         `;
       } else {
         resultDiv.className = 'p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 space-y-1.5 animate-fadeIn';
         resultDiv.innerHTML = `
-          <div class="font-bold text-base flex items-center gap-2 text-rose-700 dark:text-rose-300">
+          <div class="font-bold text-sm flex items-center gap-2 text-rose-700 dark:text-rose-300">
             <svg class="w-4 h-4 text-rose-600 dark:text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             <span>Signature Verification Failed</span>
           </div>
-          <div class="text-sm text-rose-600 dark:text-rose-200 pt-1 border-t border-rose-200 dark:border-rose-900/60">${escapeHtml(res.error || 'Signature does not match payload')}</div>
+          <div class="text-xs text-rose-600 dark:text-rose-200 pt-1 border-t border-rose-200 dark:border-rose-900/60">${escapeHtml(res.error || 'Signature does not match payload')}</div>
         `;
       }
     } catch (err) {
       resultDiv.className = 'p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 animate-fadeIn';
-      resultDiv.innerHTML = `<div class="font-bold text-sm">Error: ${escapeHtml(err.message)}</div>`;
+      resultDiv.innerHTML = `<div class="font-bold text-xs">Error: ${escapeHtml(err.message)}</div>`;
     } finally {
       // 3. Restore Button State
       verifyBtn.disabled = false;
@@ -506,11 +506,11 @@ export function openRawJsonModal() {
   const jsonStr = JSON.stringify(currentPayload, null, 2);
 
   el.modalContainer.innerHTML = `
-    <div class="p-5 sm:p-6 space-y-4 font-mono text-base">
+    <div class="p-5 sm:p-6 space-y-4 font-mono text-sm">
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-        <h3 class="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <span>Raw API JSON</span>
-          <span class="text-cyan-700 dark:text-[#00c2ff] text-sm font-normal">/r/${escapeHtml(state.currentRoom)}</span>
+          <span class="text-cyan-700 dark:text-[#00c2ff] text-xs font-normal">/r/${escapeHtml(state.currentRoom)}</span>
         </h3>
         <button id="modal-close-btn" class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white p-1">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -586,7 +586,7 @@ export function renderCommandPaletteResults(query = '') {
 
   if (matches.length === 0) {
     el.cmdPaletteResults.innerHTML = `
-      <div class="text-center py-6 text-slate-500 text-sm">
+      <div class="text-center py-6 text-slate-500 text-xs">
         No matching commands or rooms
       </div>
     `;
@@ -607,7 +607,7 @@ export function renderCommandPaletteResults(query = '') {
         <span class="truncate">${escapeHtml(item.title)}</span>
         ${
           item.badge
-            ? `<span class="text-sm px-2 py-0.5 rounded-full ${isSelected ? 'bg-slate-50 dark:bg-slate-950/20 text-slate-950' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}">${escapeHtml(item.badge)}</span>`
+            ? `<span class="text-xs px-2 py-0.5 rounded-full ${isSelected ? 'bg-slate-50 dark:bg-slate-950/20 text-slate-950' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}">${escapeHtml(item.badge)}</span>`
             : ''
         }
       </button>
