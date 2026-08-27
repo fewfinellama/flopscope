@@ -197,7 +197,7 @@ body,
 
 /* Modal Animation (Center Scale) */
 .modal-enter {
-  animation: modalEnter 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: modalEnter 0.4s ease-out forwards;
 }
 
 @keyframes modalEnter {
@@ -213,7 +213,7 @@ body,
 
 /* Bottom Sheet Slide Up Animation (Mobile) */
 .sheet-enter {
-  animation: sheetSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: sheetSlideUp 0.5s ease-out forwards;
 }
 
 @keyframes sheetSlideUp {
@@ -229,7 +229,7 @@ body,
 
 /* Drawer Slide Right Animation */
 .drawer-enter {
-  animation: drawerSlideLeft 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: drawerSlideLeft 0.5s ease-out forwards;
 }
 
 @keyframes drawerSlideLeft {
@@ -281,7 +281,7 @@ body,
 }
 
 .overlay-enter {
-  animation: overlayFadeIn 0.25s ease-out forwards;
+  animation: overlayFadeIn 0.35s ease-out forwards;
 }
 
 @keyframes overlayFadeIn {
