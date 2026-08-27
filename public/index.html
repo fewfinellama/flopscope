@@ -499,8 +499,8 @@
       <!-- Sheet Header -->
       <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
         <div class="flex items-center gap-2">
-          <h3 class="text-base font-bold font-mono text-slate-900 dark:text-white">Switch Room</h3>
-          <span id="mobile-rooms-count" class="text-xs font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">0 Active</span>
+          <h3 class="text-lg font-bold font-mono text-slate-900 dark:text-white">Switch Room</h3>
+          <span id="mobile-rooms-count" class="text-sm font-mono px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">0 Active</span>
         </div>
         <button id="mobile-rooms-close" class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-2 touch-target flex items-center justify-center">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -510,17 +510,17 @@
       <!-- Custom Jump Input inside Sheet -->
       <form id="mobile-custom-room-form" class="flex gap-2 my-3">
         <div class="relative flex-1">
-          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 dark:text-slate-400 font-mono text-sm">/r/</span>
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 dark:text-slate-400 font-mono text-base">/r/</span>
           <input
             type="text"
             id="mobile-custom-room-input"
             placeholder="room-name"
-            class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm font-mono text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#00c2ff]"
+            class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base font-mono text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#00c2ff]"
             pattern="[a-zA-Z0-9_-]{1,48}"
             required
           />
         </div>
-        <button type="submit" class="px-4 py-2.5 bg-[#00c2ff] hover:bg-[#00b4d8] text-slate-950 font-bold rounded-xl text-xs sm:text-sm font-mono">
+        <button type="submit" class="px-4 py-2.5 bg-[#00c2ff] hover:bg-[#00b4d8] text-slate-950 font-bold rounded-xl text-sm sm:text-base font-mono">
           Go
         </button>
       </form>
@@ -534,7 +534,7 @@
           type="text"
           id="mobile-room-search-input"
           placeholder="Filter rooms by name..."
-          class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#00c2ff]"
+          class="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-base text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-[#00c2ff]"
         />
       </div>
 
@@ -549,13 +549,13 @@
   <div id="mobile-more-overlay" class="fixed inset-0 z-50 bg-slate-900/50 dark:bg-black/70 backdrop-blur-md hidden items-end justify-center">
     <div class="glass-panel sheet-enter rounded-t-3xl border-t shadow-2xl w-full flex flex-col p-5 pb-8">
       <div class="w-12 h-1.5 bg-slate-300 dark:bg-slate-700 rounded-full mx-auto mb-4"></div>
-      <h3 class="text-base font-bold font-mono text-slate-900 dark:text-white mb-4">Settings & Tools</h3>
+      <h3 class="text-lg font-bold font-mono text-slate-900 dark:text-white mb-4">Settings & Tools</h3>
 
-      <div class="space-y-3 font-mono text-sm">
+      <div class="space-y-3 font-mono text-base">
         <!-- Auto-poll setting -->
         <div class="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
           <span class="text-slate-700 dark:text-slate-300">Auto-poll Feed:</span>
-          <select id="mobile-poll-interval-select" class="bg-slate-100 dark:bg-slate-800 border-0 text-cyan-700 dark:text-[#00c2ff] font-semibold rounded-xl px-3 py-1.5 text-xs sm:text-sm">
+          <select id="mobile-poll-interval-select" class="bg-slate-100 dark:bg-slate-800 border-0 text-cyan-700 dark:text-[#00c2ff] font-semibold rounded-xl px-3 py-1.5 text-sm sm:text-base">
             <option value="5">5s</option>
             <option value="10" selected>10s</option>
             <option value="30">30s</option>
@@ -576,7 +576,7 @@
         </button>
       </div>
 
-      <button id="mobile-more-close" class="mt-4 w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-mono text-sm font-semibold">
+      <button id="mobile-more-close" class="mt-4 w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl font-mono text-base font-semibold">
         Close
       </button>
     </div>
@@ -594,21 +594,21 @@
           type="text"
           id="cmd-palette-input"
           placeholder="Search rooms, actions, or jump anywhere..."
-          class="w-full bg-transparent border-0 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm sm:text-base font-sans focus:outline-none focus:ring-0"
+          class="w-full bg-transparent border-0 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-base sm:text-lg font-sans focus:outline-none focus:ring-0"
         />
         <button id="cmd-palette-close-btn" class="lg:hidden text-slate-500 dark:text-slate-400 p-1">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
-        <kbd class="hidden lg:inline-block px-2 py-0.5 text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 rounded border border-slate-200 dark:border-slate-700">ESC</kbd>
+        <kbd class="hidden lg:inline-block px-2 py-0.5 text-sm font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 rounded border border-slate-200 dark:border-slate-700">ESC</kbd>
       </div>
 
       <!-- Command & Room Results List -->
-      <div id="cmd-palette-results" class="max-h-80 overflow-y-auto p-2 space-y-1.5 font-mono text-sm">
+      <div id="cmd-palette-results" class="max-h-80 overflow-y-auto p-2 space-y-1.5 font-mono text-base">
         <!-- Injected via JavaScript -->
       </div>
       
       <!-- Footer Hints -->
-      <div class="hidden sm:flex px-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800 text-xs text-slate-500 font-mono items-center justify-between">
+      <div class="hidden sm:flex px-4 py-2.5 bg-slate-50 dark:bg-slate-950/80 border-t border-slate-200 dark:border-slate-800 text-sm text-slate-500 font-mono items-center justify-between">
         <span>Use <kbd class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-800 rounded">↑</kbd> <kbd class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-800 rounded">↓</kbd> to navigate</span>
         <span><kbd class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-800 rounded">Enter</kbd> to select</span>
       </div>
@@ -637,7 +637,7 @@
   </div>
 
   <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-50 hidden bg-slate-900 dark:bg-slate-900 border border-cyan-500 text-cyan-700 dark:text-[#00c2ff] px-4 py-2.5 rounded-xl shadow-2xl font-mono text-xs sm:text-sm flex items-center gap-2.5">
+  <div id="toast" class="fixed bottom-20 lg:bottom-6 right-4 sm:right-6 z-50 hidden bg-slate-900 dark:bg-slate-900 border border-cyan-500 text-cyan-700 dark:text-[#00c2ff] px-4 py-2.5 rounded-xl shadow-2xl font-mono text-sm sm:text-base flex items-center gap-2.5">
     <svg class="w-4 h-4 text-cyan-700 dark:text-[#00c2ff] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
       <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
     </svg>
