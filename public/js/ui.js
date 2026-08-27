@@ -153,45 +153,45 @@ export function openProofInspector(msg) {
   const verif = state.verificationCache.get(cacheKey) || { valid: true };
 
   el.modalContainer.innerHTML = `
-    <div class="p-5 sm:p-6 space-y-5 font-mono text-xs">
+    <div class="p-5 sm:p-6 space-y-5 font-mono text-xs text-slate-800 dark:text-slate-200">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
         <div class="flex items-center gap-2">
-          <svg class="w-5 h-5 text-[#00c2ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          <svg class="w-5 h-5 text-cyan-600 dark:text-[#00c2ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
           </svg>
-          <h3 class="text-base font-bold text-slate-900 dark:text-white">Cryptographic Proof Inspector</h3>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">Cryptographic Proof Inspector</h3>
         </div>
-        <button id="modal-close-btn" class="text-slate-400 hover:text-white p-1">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <button id="modal-close-btn" class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white p-1 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
 
       <!-- Verification Status Banner -->
       <div class="p-3.5 rounded-xl border ${
         verif.valid
-          ? 'bg-emerald-950/60 border-emerald-800/80 text-emerald-300'
-          : 'bg-rose-950/60 border-rose-800/80 text-rose-300'
-      } flex items-center justify-between">
+          ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-950/40 dark:border-emerald-800/60 dark:text-emerald-300'
+          : 'bg-rose-50 border-rose-200 text-rose-800 dark:bg-rose-950/40 dark:border-rose-800/60 dark:text-rose-300'
+      } flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full ${verif.valid ? 'bg-emerald-400' : 'bg-rose-400'}"></span>
-          <span class="font-bold text-sm">${verif.valid ? 'Valid Ed25519 Proof' : 'Verification Failed'}</span>
+          <span class="w-2.5 h-2.5 rounded-full shadow-sm ${verif.valid ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-rose-500 dark:bg-rose-400'}"></span>
+          <span class="font-bold text-sm tracking-tight">${verif.valid ? 'Valid Ed25519 Proof' : 'Verification Failed'}</span>
         </div>
-        <span class="text-[11px] font-normal opacity-80">Algorithm: Noble Ed25519</span>
+        <span class="text-[11px] font-medium opacity-70">Algorithm: Noble Ed25519</span>
       </div>
 
       <!-- Sender DID & Public Key -->
       <div class="space-y-1.5">
-        <label class="text-slate-400 uppercase text-[10px] tracking-wider">Sender DID</label>
-        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-200 break-all select-all">
+        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Sender DID</label>
+        <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-200 font-medium break-all select-all shadow-inner">
           ${escapeHtml(msg.from)}
         </div>
       </div>
 
       <div class="space-y-1.5">
-        <label class="text-slate-400 uppercase text-[10px] tracking-wider">Decoded 32-Byte Public Key (Hex)</label>
-        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-[#00c2ff] break-all select-all">
+        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Decoded 32-Byte Public Key (Hex)</label>
+        <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-cyan-700 dark:text-cyan-400 font-medium break-all select-all shadow-inner">
           ${pubKeyHex}
         </div>
       </div>
@@ -199,18 +199,18 @@ export function openProofInspector(msg) {
       <!-- Reconstructed Payload Structure -->
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <label class="text-slate-400 uppercase text-[10px] tracking-wider">Payload String: room|nonce|text</label>
-          <span class="text-slate-500 text-[10px]">${payloadBytes.length} UTF-8 Bytes</span>
+          <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Payload String: room|nonce|text</label>
+          <span class="text-slate-400 dark:text-slate-500 font-bold text-[10px]">${payloadBytes.length} UTF-8 Bytes</span>
         </div>
-        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-300 break-all select-all max-h-36 overflow-y-auto">
+        <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 font-medium break-all select-all max-h-36 overflow-y-auto shadow-inner leading-relaxed">
           ${escapeHtml(payloadStr)}
         </div>
       </div>
 
       <!-- Signature Hex / Base64url -->
       <div class="space-y-1.5">
-        <label class="text-slate-400 uppercase text-[10px] tracking-wider">Signature (${msg.sig ? msg.sig.length : 0} chars)</label>
-        <div class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-400 break-all select-all max-h-24 overflow-y-auto">
+        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Signature (${msg.sig ? msg.sig.length : 0} chars)</label>
+        <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-600 dark:text-slate-400 font-medium break-all select-all max-h-24 overflow-y-auto shadow-inner">
           ${escapeHtml(msg.sig || 'Upstream server attestation at write time')}
         </div>
       </div>
