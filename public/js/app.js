@@ -184,37 +184,18 @@ let themeTransitionTimer = null;
 
 function initTheme() {
   const savedTheme = localStorage.getItem('flopscope-theme');
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  state.theme = savedTheme || (prefersDark ? 'dark' : 'dark'); // Default to dark for FLOP cyan look
-  applyTheme(state.theme, false);
+  state.theme = savedTheme || 'dark';
+  // Silent init — inline <script> in <head> already set the class before paint
+  _setThemeIcons(state.theme);
 }
 
-function applyTheme(theme, animate = false) {
-  state.theme = theme;
-  try {
-    localStorage.setItem('flopscope-theme', theme);
-  } catch (e) {}
-
-  const root = document.documentElement;
-
-  if (animate) {
-    root.classList.add('theme-transition');
-    if (themeTransitionTimer) clearTimeout(themeTransitionTimer);
-    themeTransitionTimer = setTimeout(() => {
-      root.classList.remove('theme-transition');
-    }, 260);
-  }
-
+function _setThemeIcons(theme) {
   if (theme === 'dark') {
-    root.classList.add('dark');
-    root.classList.remove('light');
     if (el.themeSunIcon) el.themeSunIcon.classList.remove('hidden');
     if (el.themeMoonIcon) el.themeMoonIcon.classList.add('hidden');
     if (el.mobileThemeSunIcon) el.mobileThemeSunIcon.classList.remove('hidden');
     if (el.mobileThemeMoonIcon) el.mobileThemeMoonIcon.classList.add('hidden');
   } else {
-    root.classList.remove('dark');
-    root.classList.add('light');
     if (el.themeSunIcon) el.themeSunIcon.classList.add('hidden');
     if (el.themeMoonIcon) el.themeMoonIcon.classList.remove('hidden');
     if (el.mobileThemeSunIcon) el.mobileThemeSunIcon.classList.add('hidden');
@@ -222,9 +203,31 @@ function applyTheme(theme, animate = false) {
   }
 }
 
+function applyTheme(theme, animate = false) {
+  state.theme = theme;
+  try { localStorage.setItem('flopscope-theme', theme); } catch (e) {}
+
+  const root = document.documentElement;
+
+  if (animate) {
+    root.classList.add('theme-transition');
+    if (themeTransitionTimer) clearTimeout(themeTransitionTimer);
+    themeTransitionTimer = setTimeout(() => root.classList.remove('theme-transition'), 250);
+  }
+
+  // Swap dark/light together in a single classList.replace to minimise
+  // the number of MutationObserver callbacks the Tailwind CDN fires.
+  if (theme === 'dark') {
+    if (!root.classList.replace('light', 'dark')) root.classList.add('dark');
+  } else {
+    if (!root.classList.replace('dark', 'light')) root.classList.add('light');
+  }
+
+  _setThemeIcons(theme);
+}
+
 function toggleTheme() {
-  const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
-  applyTheme(nextTheme, true);
+  applyTheme(state.theme === 'dark' ? 'light' : 'dark', true);
 }
 
 // ==========================================

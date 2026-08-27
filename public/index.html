@@ -8,6 +8,14 @@
   <meta name="theme-color" content="#030712" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23030712' stroke='%2300c2ff' stroke-width='6'/%3E%3Cpath d='M30 35h40M30 50h25M30 65h15' stroke='%2300c2ff' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E" />
 
+  <!-- Instant theme pre-load: apply class before first paint to prevent FOUC -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('flopscope-theme') || 'dark';
+      document.documentElement.classList.add(t === 'dark' ? 'dark' : 'light');
+    })();
+  </script>
+
   <!-- Tailwind CSS CDN with Forms & Typography Plugins -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
   <script>
@@ -21,24 +29,11 @@
           },
           colors: {
             brand: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              200: '#bae6fd',
-              300: '#7dd3fc',
-              400: '#38bdf8',
-              500: '#00c2ff',
-              600: '#0096c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
-              950: '#030712',
+              50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc',
+              400: '#38bdf8', 500: '#00c2ff', 600: '#0096c7', 700: '#0369a1',
+              800: '#075985', 900: '#0c4a6e', 950: '#030712',
             },
-            flop: {
-              cyan: '#00c2ff',
-              blue: '#0096c7',
-              dark: '#030712',
-              card: '#070d1a',
-            }
+            flop: { cyan: '#00c2ff', blue: '#0096c7', dark: '#030712', card: '#070d1a' }
           },
         },
       },
