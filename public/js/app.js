@@ -465,9 +465,38 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
 
   if (isInitial && el.messagesContainer) {
     el.messagesContainer.innerHTML = `
-      <div class="text-center py-16 text-slate-400 font-mono text-sm flex flex-col items-center gap-3">
-        <div class="w-7 h-7 border-2 border-[#00c2ff] border-t-transparent rounded-full animate-spin"></div>
-        <span>Connecting to /r/${escapeHtml(roomName)} stream...</span>
+      <div class="animate-pulse glass-panel rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800/90 flex flex-col gap-4">
+        <div class="flex justify-between items-start">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800"></div>
+            <div class="flex flex-col gap-1.5">
+              <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-24"></div>
+              <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-16"></div>
+            </div>
+          </div>
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded-full w-24"></div>
+        </div>
+        <div class="space-y-2 mt-2">
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-5/6"></div>
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-4/6"></div>
+        </div>
+      </div>
+      <div class="animate-pulse glass-panel rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800/90 flex flex-col gap-4" style="animation-delay: 150ms">
+        <div class="flex justify-between items-start">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800"></div>
+            <div class="flex flex-col gap-1.5">
+              <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-32"></div>
+              <div class="h-3 bg-slate-200 dark:bg-slate-800 rounded w-20"></div>
+            </div>
+          </div>
+          <div class="h-5 bg-slate-200 dark:bg-slate-800 rounded-full w-20"></div>
+        </div>
+        <div class="space-y-2 mt-2">
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+          <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-2/3"></div>
+        </div>
       </div>
     `;
   }
