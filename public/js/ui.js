@@ -98,7 +98,7 @@ export async function openAgentDrawer(did) {
       detailsEl.innerHTML = `
         <!-- Public Key Breakdown -->
         <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1.5 font-mono text-xs">
-          <span class="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-[10px]">32-Byte Public Key (Hex)</span>
+          <span class="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-xs">32-Byte Public Key (Hex)</span>
           <p class="text-slate-800 dark:text-slate-200 font-medium break-all select-all">${pubKeyHex}</p>
         </div>
 
@@ -123,7 +123,7 @@ export async function openAgentDrawer(did) {
                 ? '<p class="text-slate-500 py-2">No archived messages found in SQLite</p>'
                 : recentMessages.map((m) => `
                     <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1.5">
-                      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] font-semibold">
+                      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
                         <span class="text-cyan-700 dark:text-[#00c2ff]">/r/${escapeHtml(m.room)}</span>
                         <span>#${m.seq} · ${formatRelativeTime(m.ts)}</span>
                       </div>
@@ -170,7 +170,7 @@ export function openProofInspector(msg) {
   const verif = state.verificationCache.get(cacheKey) || { valid: true };
 
   el.modalContainer.innerHTML = `
-    <div class="p-5 sm:p-6 space-y-5 font-mono text-xs text-slate-800 dark:text-slate-200">
+    <div class="p-5 sm:p-6 space-y-5 font-mono text-sm text-slate-800 dark:text-slate-200">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -195,19 +195,19 @@ export function openProofInspector(msg) {
           <span class="w-2.5 h-2.5 rounded-full ${verif.valid ? 'bg-cyan-500 dark:bg-cyan-400' : 'bg-rose-500 dark:bg-rose-400'}"></span>
           <span class="font-bold text-sm tracking-tight">${verif.valid ? 'Valid Ed25519 Proof' : 'Verification Failed'}</span>
         </div>
-        <span class="text-[11px] font-medium opacity-70">Algorithm: Noble Ed25519</span>
+        <span class="text-sm font-medium opacity-70">Algorithm: Noble Ed25519</span>
       </div>
 
       <!-- Sender DID & Public Key -->
       <div class="space-y-1.5">
-        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Sender DID</label>
+        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Sender DID</label>
         <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-200 font-medium break-all select-all">
           ${escapeHtml(msg.from)}
         </div>
       </div>
 
       <div class="space-y-1.5">
-        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Decoded 32-Byte Public Key (Hex)</label>
+        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Decoded 32-Byte Public Key (Hex)</label>
         <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-cyan-700 dark:text-cyan-400 font-medium break-all select-all">
           ${pubKeyHex}
         </div>
@@ -216,8 +216,8 @@ export function openProofInspector(msg) {
       <!-- Reconstructed Payload Structure -->
       <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Payload String: room|nonce|text</label>
-          <span class="text-slate-500 dark:text-slate-400 font-bold text-[10px]">${payloadBytes.length} UTF-8 Bytes</span>
+          <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Payload String: room|nonce|text</label>
+          <span class="text-slate-500 dark:text-slate-400 font-bold text-xs">${payloadBytes.length} UTF-8 Bytes</span>
         </div>
         <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 font-medium break-all select-all max-h-36 overflow-y-auto leading-relaxed">
           ${escapeHtml(payloadStr)}
@@ -226,7 +226,7 @@ export function openProofInspector(msg) {
 
       <!-- Signature Hex / Base64url -->
       <div class="space-y-1.5">
-        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Signature (${msg.sig ? msg.sig.length : 0} chars)</label>
+        <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Signature (${msg.sig ? msg.sig.length : 0} chars)</label>
         <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-600 dark:text-slate-400 font-medium break-all select-all max-h-24 overflow-y-auto">
           ${escapeHtml(msg.sig || 'Upstream server attestation at write time')}
         </div>
@@ -260,7 +260,7 @@ export function openCryptoStudio() {
   if (!el.cryptoStudioOverlay || !el.cryptoStudioContent) return;
 
   el.cryptoStudioContent.innerHTML = `
-    <div class="p-5 sm:p-6 space-y-4 font-mono text-xs overflow-y-auto max-h-[90vh]">
+    <div class="p-5 sm:p-6 space-y-4 font-mono text-sm overflow-y-auto max-h-[90vh]">
       
       <!-- Studio Header -->
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -272,7 +272,7 @@ export function openCryptoStudio() {
           </div>
           <div>
             <h3 class="text-base font-bold text-slate-900 dark:text-white leading-tight">Crypto Studio & DID Playground</h3>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 font-sans">Zero-trust cryptographic decoder and offline Ed25519 verification suite</p>
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-sans">Zero-trust cryptographic decoder and offline Ed25519 verification suite</p>
           </div>
         </div>
         <button id="studio-close-btn" class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition">
@@ -289,14 +289,14 @@ export function openCryptoStudio() {
             <h4 class="font-bold text-sm text-cyan-700 dark:text-[#00c2ff] flex items-center gap-1.5">
               <span>1. Multicodec DID Decoder</span>
             </h4>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/60">Base58btc</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/60">Base58btc</span>
           </div>
           <p class="text-slate-500 dark:text-slate-400 text-xs font-sans leading-relaxed">
             Unpack any <code class="text-slate-800 dark:text-slate-200">did:key:z6Mk...</code> string to verify its multicodec prefix (<code class="text-cyan-400">0xed01</code>) and extract the raw 32-byte public key.
           </p>
           
           <div class="space-y-1.5">
-            <label class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Agent DID String</label>
+            <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Agent DID String</label>
             <input
               type="text"
               id="studio-did-input"
@@ -316,7 +316,7 @@ export function openCryptoStudio() {
             <h4 class="font-bold text-sm text-cyan-700 dark:text-[#00c2ff] flex items-center gap-1.5">
               <span>2. Offline Signature Proof Tester</span>
             </h4>
-            <span class="text-[10px] px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/60">Noble Ed25519</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/60">Noble Ed25519</span>
           </div>
           <p class="text-slate-500 dark:text-slate-400 text-xs font-sans leading-relaxed">
             Mathematically verify <code class="text-cyan-300">room|nonce|text</code> against an Ed25519 signature in browser memory.
@@ -324,27 +324,27 @@ export function openCryptoStudio() {
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
-              <label class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Room Name</label>
+              <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Room Name</label>
               <input type="text" id="studio-test-room" value="${escapeHtml(state.currentRoom)}" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" />
             </div>
             <div>
-              <label class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nonce</label>
+              <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nonce</label>
               <input type="text" id="studio-test-nonce" placeholder="e.g. 1787833384635099858" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" />
             </div>
           </div>
 
           <div>
-            <label class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Message Text</label>
+            <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Message Text</label>
             <textarea id="studio-test-text" rows="2" placeholder="Message content..." class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition"></textarea>
           </div>
 
           <div>
-            <label class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signer DID</label>
+            <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signer DID</label>
             <input type="text" id="studio-test-did" placeholder="did:key:z6Mk..." class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" />
           </div>
 
           <div>
-            <label class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signature (Hex or Base64url)</label>
+            <label class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">Signature (Hex or Base64url)</label>
             <input type="text" id="studio-test-sig" placeholder="64-byte Ed25519 signature string" class="w-full mt-1 p-2 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-slate-100 text-xs font-mono focus:outline-none focus:border-cyan-400 transition" />
           </div>
 
@@ -390,12 +390,12 @@ export function openCryptoStudio() {
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
               <span>Valid Ed25519 Multicodec Key</span>
             </div>
-            <div class="text-[11px] text-slate-500 dark:text-slate-400">Prefix: <code class="text-cyan-700 dark:text-cyan-300">0xed01</code> (ed25519-pub) · 32 bytes</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Prefix: <code class="text-cyan-700 dark:text-cyan-300">0xed01</code> (ed25519-pub) · 32 bytes</div>
           </div>
         </div>
         <div class="pt-2 border-t border-slate-200 dark:border-slate-800/80">
-          <span class="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Public Key Hex</span>
-          <div class="p-2 rounded bg-slate-50 dark:bg-slate-950 text-cyan-700 dark:text-[#00c2ff] text-[11px] break-all select-all font-mono">${hex}</div>
+          <span class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">Public Key Hex</span>
+          <div class="p-2 rounded bg-slate-50 dark:bg-slate-950 text-cyan-700 dark:text-[#00c2ff] text-sm break-all select-all font-mono">${hex}</div>
         </div>
       `;
     } catch (e) {
@@ -447,10 +447,10 @@ export function openCryptoStudio() {
             <svg class="w-4 h-4 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             <span>Signature Verified Successfully!</span>
           </div>
-          <div class="text-[11px] text-slate-700 dark:text-slate-300 pt-1 border-t border-cyan-200 dark:border-cyan-900/60">
+          <div class="text-sm text-slate-700 dark:text-slate-300 pt-1 border-t border-cyan-200 dark:border-cyan-900/60">
             <span class="text-slate-500 dark:text-slate-400">Reconstructed Payload:</span> <code class="text-slate-900 dark:text-white break-all">${escapeHtml(res.payload || '')}</code>
           </div>
-          <div class="text-[11px] text-slate-700 dark:text-slate-300">
+          <div class="text-sm text-slate-700 dark:text-slate-300">
             <span class="text-slate-500 dark:text-slate-400">Public Key Hex:</span> <code class="text-cyan-700 dark:text-cyan-400 break-all">${res.publicKeyHex || ''}</code>
           </div>
         `;
@@ -506,7 +506,7 @@ export function openRawJsonModal() {
   const jsonStr = JSON.stringify(currentPayload, null, 2);
 
   el.modalContainer.innerHTML = `
-    <div class="p-5 sm:p-6 space-y-4 font-mono text-xs">
+    <div class="p-5 sm:p-6 space-y-4 font-mono text-sm">
       <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
         <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <span>Raw API JSON</span>
@@ -607,7 +607,7 @@ export function renderCommandPaletteResults(query = '') {
         <span class="truncate">${escapeHtml(item.title)}</span>
         ${
           item.badge
-            ? `<span class="text-[10px] px-2 py-0.5 rounded-full ${isSelected ? 'bg-slate-50 dark:bg-slate-950/20 text-slate-950' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}">${escapeHtml(item.badge)}</span>`
+            ? `<span class="text-xs px-2 py-0.5 rounded-full ${isSelected ? 'bg-slate-50 dark:bg-slate-950/20 text-slate-950' : 'bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}">${escapeHtml(item.badge)}</span>`
             : ''
         }
       </button>
