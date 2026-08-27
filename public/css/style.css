@@ -59,9 +59,21 @@ body {
   color: var(--text-main);
   font-size: 1rem;
   line-height: 1.6;
-  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-x: hidden;
   padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Synchronized Theme Transition for 60fps buttery smooth toggle */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              fill 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition-delay: 0s !important;
 }
 
 .font-mono {
@@ -75,7 +87,6 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-app);
   box-shadow: var(--card-shadow);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
 .glass-header {
@@ -83,7 +94,6 @@ body {
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--border-app);
-  transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 /* Mobile Bottom Navigation Bar */

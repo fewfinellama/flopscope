@@ -180,17 +180,30 @@ export function showToast(message, durationMs = 2600) {
 // ==========================================
 // THEME MANAGEMENT
 // ==========================================
+let themeTransitionTimer = null;
+
 function initTheme() {
   const savedTheme = localStorage.getItem('flopscope-theme');
   const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   state.theme = savedTheme || (prefersDark ? 'dark' : 'dark'); // Default to dark for FLOP cyan look
-  applyTheme(state.theme);
+  applyTheme(state.theme, false);
 }
 
-function applyTheme(theme) {
+function applyTheme(theme, animate = false) {
   state.theme = theme;
-  localStorage.setItem('flopscope-theme', theme);
+  try {
+    localStorage.setItem('flopscope-theme', theme);
+  } catch (e) {}
+
   const root = document.documentElement;
+
+  if (animate) {
+    root.classList.add('theme-transition');
+    if (themeTransitionTimer) clearTimeout(themeTransitionTimer);
+    themeTransitionTimer = setTimeout(() => {
+      root.classList.remove('theme-transition');
+    }, 260);
+  }
 
   if (theme === 'dark') {
     root.classList.add('dark');
@@ -210,8 +223,8 @@ function applyTheme(theme) {
 }
 
 function toggleTheme() {
-  applyTheme(state.theme === 'dark' ? 'light' : 'dark');
-  showToast(`Switched to ${state.theme === 'dark' ? 'Dark' : 'Light'} Mode`);
+  const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(nextTheme, true);
 }
 
 // ==========================================
