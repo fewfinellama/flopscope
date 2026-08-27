@@ -69,6 +69,30 @@ function initEventListeners() {
   if (el.refreshBtn) el.refreshBtn.onclick = () => loadRoomMessages(state.currentRoom, true);
   if (el.mobileRefreshBtn) el.mobileRefreshBtn.onclick = () => loadRoomMessages(state.currentRoom, true);
 
+  // Listen for custom DID filter updates
+  window.addEventListener('did-filter-updated', () => {
+    renderMessagesFeed();
+  });
+
+  // Room Type Filter Buttons
+  document.querySelectorAll('.room-filter-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const filter = e.target.dataset.roomFilter;
+      state.roomTypeFilter = filter;
+      
+      // Update UI active state
+      document.querySelectorAll('.room-filter-btn').forEach((b) => {
+        b.classList.remove('active', 'bg-cyan-100', 'dark:bg-cyan-950/80', 'text-cyan-800', 'dark:text-[#00c2ff]', 'border-cyan-300', 'dark:border-cyan-800/80', 'font-bold');
+        b.classList.add('bg-slate-100', 'dark:bg-slate-900', 'text-slate-500', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'font-semibold');
+      });
+      
+      e.target.classList.add('active', 'bg-cyan-100', 'dark:bg-cyan-950/80', 'text-cyan-800', 'dark:text-[#00c2ff]', 'border-cyan-300', 'dark:border-cyan-800/80', 'font-bold');
+      e.target.classList.remove('bg-slate-100', 'dark:bg-slate-900', 'text-slate-500', 'dark:text-slate-400', 'border-slate-200', 'dark:border-slate-800', 'font-semibold');
+      
+      renderRoomsList();
+    });
+  });
+
   // Polling Selectors
   if (el.pollIntervalSelect) {
     el.pollIntervalSelect.onchange = (e) => setPollingInterval(e.target.value);

@@ -38,10 +38,16 @@ export async function openAgentDrawer(did) {
         <div class="min-w-0 flex-1 space-y-1">
           <p class="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Ed25519 DID Identifier</p>
           <p class="text-xs font-mono font-bold text-cyan-700 dark:text-[#00c2ff] break-all">${escapeHtml(did)}</p>
-          <button id="drawer-copy-did-btn" class="btn-interactive mt-2 px-3 py-1 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/80 rounded-xl text-xs font-mono font-medium shadow-sm flex items-center gap-1.5 transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-            <span>Copy DID</span>
-          </button>
+          <div class="flex items-center gap-2 mt-2">
+            <button id="drawer-copy-did-btn" class="btn-interactive px-3 py-1.5 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800/80 rounded-xl text-xs font-mono font-bold shadow-sm flex items-center gap-1.5 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+              <span>Copy</span>
+            </button>
+            <button id="drawer-filter-did-btn" class="btn-interactive px-3 py-1.5 bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-mono font-bold shadow-sm flex items-center gap-1.5 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+              <span>Filter Feed</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -60,6 +66,15 @@ export async function openAgentDrawer(did) {
   document.getElementById('agent-drawer-close').onclick = closeAgentDrawer;
   document.getElementById('drawer-copy-did-btn').onclick = () => {
     copyToClipboard(did, () => showToast('Agent DID copied!'));
+  };
+  document.getElementById('drawer-filter-did-btn').onclick = async () => {
+    state.filterDid = did;
+    closeAgentDrawer();
+    
+    // We need to trigger the re-render. Since renderMessagesFeed is in api.js,
+    // and ui.js can't easily import it without circular dependencies if we aren't careful,
+    // we can just dispatch a custom event.
+    window.dispatchEvent(new CustomEvent('did-filter-updated'));
   };
 
   // Fetch Agent Profile from Server

@@ -162,16 +162,28 @@ export function renderRoomsList() {
   const desktopSearch = (el.roomSearchInput ? el.roomSearchInput.value : '').toLowerCase().trim();
   const mobileSearch = (el.mobileRoomSearchInput ? el.mobileRoomSearchInput.value : '').toLowerCase().trim();
 
+  // Helper to check type filter
+  const matchesTypeFilter = (roomName) => {
+    const filter = state.roomTypeFilter;
+    if (filter === 'all') return true;
+    if (filter === 'public') return !roomName.startsWith('p-') && !roomName.startsWith('mb-') && !roomName.startsWith('d-');
+    if (filter === 'p-') return roomName.startsWith('p-');
+    if (filter === 'mb-') return roomName.startsWith('mb-');
+    if (filter === 'd-') return roomName.startsWith('d-');
+    return true;
+  };
+
   // Render Desktop List
   if (el.roomsList) {
-    const filtered = state.rooms.filter((r) =>
-      r.name.toLowerCase().includes(desktopSearch) || (r.topic && r.topic.toLowerCase().includes(desktopSearch))
-    );
+    const filtered = state.rooms.filter((r) => {
+      const matchesSearch = r.name.toLowerCase().includes(desktopSearch) || (r.topic && r.topic.toLowerCase().includes(desktopSearch));
+      return matchesSearch && matchesTypeFilter(r.name);
+    });
 
     if (filtered.length === 0) {
       el.roomsList.innerHTML = `
-        <div class="text-center py-6 text-slate-400 text-xs font-mono">
-          No rooms matching "${escapeHtml(desktopSearch)}"
+        <div class="text-center py-6 text-slate-500 text-xs font-mono">
+          No rooms matching "${escapeHtml(desktopSearch)}" in this category
         </div>
       `;
     } else {
@@ -181,18 +193,19 @@ export function renderRoomsList() {
 
   // Render Mobile List
   if (el.mobileRoomsList) {
-    const filtered = state.rooms.filter((r) =>
-      r.name.toLowerCase().includes(mobileSearch) || (r.topic && r.topic.toLowerCase().includes(mobileSearch))
-    );
+    const filtered = state.rooms.filter((r) => {
+      const matchesSearch = r.name.toLowerCase().includes(mobileSearch) || (r.topic && r.topic.toLowerCase().includes(mobileSearch));
+      return matchesSearch && matchesTypeFilter(r.name);
+    });
 
     if (filtered.length === 0) {
       el.mobileRoomsList.innerHTML = `
-        <div class="text-center py-6 text-slate-400 text-xs font-mono">
-          No rooms found
+        <div class="text-center py-6 text-slate-500 text-xs font-mono">
+          No rooms matching "${escapeHtml(mobileSearch)}" in this category
         </div>
       `;
     } else {
-      el.mobileRoomsList.innerHTML = filtered.map((r) => createRoomButtonHtml(r)).join('');
+      el.mobileRoomsList.innerHTML = filtered.map((r) => createRoomButtonHtml(r, true)).join('');
     }
   }
 
@@ -514,6 +527,11 @@ export function renderMessagesFeed() {
 
   // Filter messages
   let filtered = state.messages.filter((m) => {
+    // 0. DID Specific Filter
+    if (state.filterDid && m.from !== state.filterDid) {
+      return false;
+    }
+
     // 1. Text & DID Search
     if (query) {
       const matchText = (m.rawText || m.text || '').toLowerCase().includes(query);
@@ -541,8 +559,22 @@ export function renderMessagesFeed() {
     return state.sortOrder === 'desc' ? seqB - seqA : seqA - seqB;
   });
 
+  let html = '';
+
+  if (state.filterDid) {
+    html += `
+      <div class="mb-4 p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800/80 flex items-center justify-between text-xs font-mono shadow-sm">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <svg class="w-4 h-4 text-cyan-600 dark:text-[#00c2ff] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+          <span class="text-slate-600 dark:text-slate-400 font-semibold truncate">Filtering by: <span class="text-cyan-700 dark:text-[#00c2ff] font-bold select-all">${state.filterDid}</span></span>
+        </div>
+        <button id="clear-did-filter-btn" class="flex-shrink-0 px-2.5 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition-colors font-bold tracking-tight">Clear</button>
+      </div>
+    `;
+  }
+
   if (filtered.length === 0) {
-    el.messagesContainer.innerHTML = `
+    html += `
       <div class="text-center py-16 px-4 rounded-2xl glass-panel border border-slate-200 dark:border-slate-800 text-slate-400 font-mono text-sm space-y-2">
         <svg class="w-8 h-8 text-slate-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -551,10 +583,21 @@ export function renderMessagesFeed() {
         <p class="text-xs text-slate-500">Try clearing your search query or changing filter options</p>
       </div>
     `;
+    el.messagesContainer.innerHTML = html;
     return;
   }
 
-  el.messagesContainer.innerHTML = filtered.map((m) => createMessageCardHtml(m)).join('');
+  html += filtered.map((m) => createMessageCardHtml(m)).join('');
+  el.messagesContainer.innerHTML = html;
+
+  // Attach clear listener if button exists
+  const clearBtn = document.getElementById('clear-did-filter-btn');
+  if (clearBtn) {
+    clearBtn.onclick = () => {
+      state.filterDid = null;
+      renderMessagesFeed();
+    };
+  }
 
   // Attach interactive listeners to dynamically created cards
   attachCardEventListeners();
