@@ -180,28 +180,22 @@ export function showToast(message, durationMs = 2600) {
 // ==========================================
 // THEME MANAGEMENT
 // ==========================================
+
+
 function initTheme() {
   const savedTheme = localStorage.getItem('flopscope-theme');
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  state.theme = savedTheme || (prefersDark ? 'dark' : 'dark'); // Default to dark for FLOP cyan look
-  applyTheme(state.theme);
+  state.theme = savedTheme || 'dark';
+  // Silent init — inline <script> in <head> already set the class before paint
+  _setThemeIcons(state.theme);
 }
 
-function applyTheme(theme) {
-  state.theme = theme;
-  localStorage.setItem('flopscope-theme', theme);
-  const root = document.documentElement;
-
+function _setThemeIcons(theme) {
   if (theme === 'dark') {
-    root.classList.add('dark');
-    root.classList.remove('light');
     if (el.themeSunIcon) el.themeSunIcon.classList.remove('hidden');
     if (el.themeMoonIcon) el.themeMoonIcon.classList.add('hidden');
     if (el.mobileThemeSunIcon) el.mobileThemeSunIcon.classList.remove('hidden');
     if (el.mobileThemeMoonIcon) el.mobileThemeMoonIcon.classList.add('hidden');
   } else {
-    root.classList.remove('dark');
-    root.classList.add('light');
     if (el.themeSunIcon) el.themeSunIcon.classList.add('hidden');
     if (el.themeMoonIcon) el.themeMoonIcon.classList.remove('hidden');
     if (el.mobileThemeSunIcon) el.mobileThemeSunIcon.classList.add('hidden');
@@ -209,9 +203,44 @@ function applyTheme(theme) {
   }
 }
 
+let _noTransitionStyle = null;
+
+function applyTheme(theme) {
+  state.theme = theme;
+  try { localStorage.setItem('flopscope-theme', theme); } catch (e) {}
+
+  // Suppress ALL transitions for this single frame so the theme swap
+  // is visually instant. We inject a <style> tag, swap the class,
+  // then remove the tag after two rAF ticks (giving the browser time
+  // to commit the new frame before re-enabling transitions).
+  if (!_noTransitionStyle) {
+    _noTransitionStyle = document.createElement('style');
+    _noTransitionStyle.textContent = '*,*::before,*::after{transition:none!important}';
+  }
+  document.head.appendChild(_noTransitionStyle);
+
+  const root = document.documentElement;
+  if (theme === 'dark') {
+    if (!root.classList.replace('light', 'dark')) root.classList.add('dark');
+  } else {
+    if (!root.classList.replace('dark', 'light')) root.classList.add('light');
+  }
+
+  _setThemeIcons(theme);
+
+  // Double rAF: first tick commits the DOM change, second tick removes
+  // the suppressor after the browser has painted the new frame.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (_noTransitionStyle && _noTransitionStyle.parentNode) {
+        document.head.removeChild(_noTransitionStyle);
+      }
+    });
+  });
+}
+
 function toggleTheme() {
   applyTheme(state.theme === 'dark' ? 'light' : 'dark');
-  showToast(`Switched to ${state.theme === 'dark' ? 'Dark' : 'Light'} Mode`);
 }
 
 // ==========================================
@@ -1325,71 +1354,6 @@ export function openCryptoStudio() {
           </svg>
         `;
       }
-    }
-  };
-}
-
-  el.cryptoStudioOverlay.classList.remove('hidden');
-  el.cryptoStudioOverlay.classList.add('flex');
-
-  document.getElementById('studio-close-btn').onclick = closeCryptoStudio;
-
-  // DID Input Listener
-  const didInput = document.getElementById('studio-did-input');
-  const didOutput = document.getElementById('studio-did-output');
-  didInput.oninput = () => {
-    const val = didInput.value.trim();
-    if (!val) {
-      didOutput.classList.add('hidden');
-      return;
-    }
-    try {
-      const bytes = decodeDidKey(val);
-      const hex = bytesToHex(bytes);
-      didOutput.classList.remove('hidden');
-      didOutput.innerHTML = `
-        <span class="text-emerald-400 font-bold">✓ Valid Ed25519 DID Key</span><br/>
-        <span class="text-slate-400">Public Key Hex:</span> <span class="text-white select-all">${hex}</span><br/>
-        <span class="text-slate-400">Length:</span> 32 bytes (256 bits)
-      `;
-    } catch (e) {
-      didOutput.classList.remove('hidden');
-      didOutput.innerHTML = `<span class="text-rose-400 font-bold">✗ ${escapeHtml(e.message)}</span>`;
-    }
-  };
-
-  // Run Signature Verification Listener
-  const verifyBtn = document.getElementById('studio-run-verify-btn');
-  const resultDiv = document.getElementById('studio-verify-result');
-  verifyBtn.onclick = async () => {
-    const room = document.getElementById('studio-test-room').value.trim();
-    const nonce = document.getElementById('studio-test-nonce').value.trim();
-    const text = document.getElementById('studio-test-text').value;
-    const did = document.getElementById('studio-test-did').value.trim();
-    const sig = document.getElementById('studio-test-sig').value.trim();
-
-    resultDiv.classList.remove('hidden');
-    resultDiv.innerHTML = '<span class="text-cyan-400">Calculating signature proof...</span>';
-
-    try {
-      const res = await verifyTechnocoreMessage(room, nonce, text, did, sig);
-      if (res.valid) {
-        resultDiv.className = 'p-3 rounded-xl bg-emerald-950/80 border border-emerald-800 text-emerald-300';
-        resultDiv.innerHTML = `
-          <div class="font-bold text-sm">✓ Signature Verified Successfully!</div>
-          <div class="text-xs text-slate-300 mt-1">Reconstructed Payload: <code class="text-white">${escapeHtml(res.payload || '')}</code></div>
-          <div class="text-xs text-slate-300">Public Key: <code class="text-emerald-400">${res.publicKeyHex || ''}</code></div>
-        `;
-      } else {
-        resultDiv.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300';
-        resultDiv.innerHTML = `
-          <div class="font-bold text-sm">✗ Signature Verification Failed</div>
-          <div class="text-xs text-rose-200 mt-1">Reason: ${escapeHtml(res.error || 'Signature does not match payload')}</div>
-        `;
-      }
-    } catch (err) {
-      resultDiv.className = 'p-3 rounded-xl bg-rose-950/80 border border-rose-800 text-rose-300';
-      resultDiv.innerHTML = `<div class="font-bold">Error: ${escapeHtml(err.message)}</div>`;
     }
   };
 }

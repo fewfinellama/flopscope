@@ -8,45 +8,27 @@
   <meta name="theme-color" content="#030712" />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23030712' stroke='%2300c2ff' stroke-width='6'/%3E%3Cpath d='M30 35h40M30 50h25M30 65h15' stroke='%2300c2ff' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E" />
 
-  <!-- Tailwind CSS CDN with Forms & Typography Plugins -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <!-- Instant theme pre-load: apply class before first paint to prevent FOUC -->
   <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          },
-          colors: {
-            brand: {
-              50: '#f0f9ff',
-              100: '#e0f2fe',
-              200: '#bae6fd',
-              300: '#7dd3fc',
-              400: '#38bdf8',
-              500: '#00c2ff',
-              600: '#0096c7',
-              700: '#0369a1',
-              800: '#075985',
-              900: '#0c4a6e',
-              950: '#030712',
-            },
-            flop: {
-              cyan: '#00c2ff',
-              blue: '#0096c7',
-              dark: '#030712',
-              card: '#070d1a',
-            }
-          },
-        },
-      },
-    }
+    (function(){
+      var t = localStorage.getItem('flopscope-theme') || 'dark';
+      document.documentElement.classList.add(t === 'dark' ? 'dark' : 'light');
+    })();
   </script>
+
+  <!-- Core Web Vitals LCP Optimizations -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="image" href="/assets/flop-banner.jpeg" fetchpriority="high" />
+  <link rel="preload" as="image" href="/assets/flop-logo.jpg" fetchpriority="high" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Pre-compiled production Tailwind CSS — no runtime, instant theme switching -->
+  <link rel="stylesheet" href="/css/tailwind.min.css" />
 
   <!-- Custom CSS Stylesheet -->
   <link rel="stylesheet" href="/css/style.css" />
+  <link rel="modulepreload" href="/js/app.js?v=1.0.2" />
 </head>
 <body class="min-h-screen flex flex-col antialiased selection:bg-cyan-500/30 selection:text-cyan-200 flop-grid-bg pb-16 lg:pb-0">
 
@@ -56,7 +38,7 @@
     <!-- Brand & FLOP Logo -->
     <div class="flex items-center gap-3 min-w-0">
       <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl overflow-hidden shadow-lg shadow-cyan-500/25 border border-cyan-400/40 bg-black flex-shrink-0 flex items-center justify-center transition-transform duration-300 hover:scale-105">
-        <img src="/assets/flop-logo.jpg" alt="FLOP Logo" class="w-full h-full object-cover" />
+        <img src="/assets/flop-logo.jpg" alt="FLOP Logo" class="w-full h-full object-cover" fetchpriority="high" decoding="async" />
       </div>
       <div class="min-w-0">
         <div class="flex items-center gap-2">
@@ -232,7 +214,7 @@
       <!-- FLOP Banner & Protocol Summary Box -->
       <div class="glass-panel rounded-2xl p-3.5 text-xs space-y-2 border border-slate-200 dark:border-slate-800/80 flex-shrink-0">
         <div class="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm bg-black">
-          <img src="/assets/flop-banner.jpeg" alt="$FLOP is food for your AI agent" class="w-full h-auto object-cover" />
+          <img src="/assets/flop-banner.jpeg" alt="$FLOP is food for your AI agent" class="w-full h-auto object-cover" fetchpriority="high" decoding="async" />
         </div>
         <div class="flex items-center gap-1.5 text-cyan-600 dark:text-[#00c2ff] font-mono font-semibold text-xs">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -594,6 +576,6 @@
   </div>
 
   <!-- Client Application Script (ES Module) -->
-  <script type="module" src="/js/app.js"></script>
+  <script type="module" src="/js/app.js?v=1.0.2"></script>
 </body>
 </html>

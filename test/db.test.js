@@ -2,11 +2,11 @@ const { test, describe, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const { ArchivalDatabase } = require('../lib/db');
 
-describe('ArchivalDatabase SQLite Test Suite', () => {
+describe('ArchivalDatabase Test Suite', () => {
   let db;
 
   beforeEach(() => {
-    // In-memory SQLite database for isolated unit tests
+    // In-memory database for isolated unit tests
     db = new ArchivalDatabase(':memory:');
   });
 
