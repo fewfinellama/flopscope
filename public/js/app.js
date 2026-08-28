@@ -204,7 +204,28 @@ function initEventListeners() {
   if (el.searchInput) {
     el.searchInput.oninput = (e) => {
       state.searchQuery = e.target.value;
+      
+      // Toggle clear button visibility
+      if (el.clearSearchBtn) {
+        if (state.searchQuery.length > 0) {
+          el.clearSearchBtn.classList.remove('hidden');
+        } else {
+          el.clearSearchBtn.classList.add('hidden');
+        }
+      }
+      
       renderMessagesFeed();
+    };
+  }
+  
+  if (el.clearSearchBtn) {
+    el.clearSearchBtn.onclick = () => {
+      if (el.searchInput) {
+        el.searchInput.value = '';
+        state.searchQuery = '';
+        el.clearSearchBtn.classList.add('hidden');
+        renderMessagesFeed();
+      }
     };
   }
 

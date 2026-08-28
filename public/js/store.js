@@ -67,6 +67,7 @@ export function initElements() {
 
   // Controls & Filter
   el.searchInput = document.getElementById('search-input');
+  el.clearSearchBtn = document.getElementById("clear-search-btn");
   el.filterSelect = document.getElementById('filter-select');
   el.sortBtn = document.getElementById('sort-btn');
   el.sortIcon = document.getElementById('sort-icon');
