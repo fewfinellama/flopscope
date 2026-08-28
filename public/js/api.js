@@ -65,6 +65,19 @@ export function switchRoom(roomName, updateUrl = true) {
   state.hasReachedHistoryEnd = false;
   state.lastFetchedSeq = null;
 
+  // Clear sidebar search boxes so it doesn't stay stuck on empty state
+  if (el.roomSearchInput) el.roomSearchInput.value = '';
+  if (el.mobileRoomSearchInput) el.mobileRoomSearchInput.value = '';
+
+  // Inject room into list if it's new so it immediately appears in the sidebar
+  if (!state.rooms.find((r) => r.name === cleanName)) {
+    state.rooms.unshift({ name: cleanName, topic: 'Discovered via Jump', active: true });
+  }
+  
+  if (typeof renderRoomsList === 'function') {
+    renderRoomsList();
+  }
+
   if (updateUrl) {
     try {
       window.history.replaceState(null, '', `#r=${encodeURIComponent(cleanName)}`);
