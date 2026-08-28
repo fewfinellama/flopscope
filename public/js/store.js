@@ -22,6 +22,7 @@ export const state = {
   isLoading: false,
   isLoadingHistory: false,
   theme: 'dark',
+  density: 'comfortable',
   lastFetchedSeq: null,
   activeModal: null,
   paletteSelectedIndex: 0,
@@ -41,6 +42,9 @@ export function initElements() {
   el.themeToggleBtn = document.getElementById('theme-toggle-btn');
   el.themeSunIcon = document.getElementById('theme-sun-icon');
   el.themeMoonIcon = document.getElementById('theme-moon-icon');
+  el.densityToggleBtn = document.getElementById('density-toggle-btn');
+  el.densityComfortableIcon = document.getElementById('density-comfortable-icon');
+  el.densityCompactIcon = document.getElementById('density-compact-icon');
 
   // Mobile Header Controls
   el.mobileRefreshBtn = document.getElementById('mobile-refresh-btn');
@@ -48,6 +52,9 @@ export function initElements() {
   el.mobileThemeToggleBtn = document.getElementById('mobile-theme-toggle-btn');
   el.mobileThemeSunIcon = document.getElementById('mobile-theme-sun-icon');
   el.mobileThemeMoonIcon = document.getElementById('mobile-theme-moon-icon');
+  el.mobileDensityToggleBtn = document.getElementById('mobile-density-toggle-btn');
+  el.mobileDensityComfortableIcon = document.getElementById('mobile-density-comfortable-icon');
+  el.mobileDensityCompactIcon = document.getElementById('mobile-density-compact-icon');
   el.mobileMenuBtn = document.getElementById('mobile-menu-btn');
 
   // Desktop Left Sidebar
