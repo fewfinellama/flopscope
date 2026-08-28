@@ -877,27 +877,32 @@ export function jumpToMessage(room, seq) {
   closeAgentDrawer();
 
   if (state.currentRoom !== room) {
+    showToast(`Jumping to /r/${room}...`);
     switchRoom(room);
     // Poll every 100ms until the message card is rendered
     let attempts = 0;
     const checkExist = setInterval(() => {
-      const el = document.getElementById(`msg-${seq}`);
-      if (el || attempts > 20) {
+      const targetEl = document.getElementById(`msg-${seq}`);
+      if (targetEl || attempts > 20) {
         clearInterval(checkExist);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el.classList.add('ring-2', 'ring-[#00c2ff]');
-          setTimeout(() => el.classList.remove('ring-2', 'ring-[#00c2ff]'), 2000);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetEl.classList.add('ring-2', 'ring-cyan-400');
+          setTimeout(() => targetEl.classList.remove('ring-2', 'ring-cyan-400'), 2000);
+        } else {
+          showToast(`Message #${seq} is too old to be in the recent feed.`);
         }
       }
       attempts++;
     }, 100);
   } else {
-    const el = document.getElementById(`msg-${seq}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      el.classList.add('ring-2', 'ring-[#00c2ff]');
-      setTimeout(() => el.classList.remove('ring-2', 'ring-[#00c2ff]'), 2000);
+    const targetEl = document.getElementById(`msg-${seq}`);
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetEl.classList.add('ring-2', 'ring-cyan-400');
+      setTimeout(() => targetEl.classList.remove('ring-2', 'ring-cyan-400'), 2000);
+    } else {
+      showToast(`Message #${seq} is too old to be in the recent feed. Load more history first.`);
     }
   }
 }
