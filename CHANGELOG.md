@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- **Test Coverage (`health-scorer`, `did-analyzer`)**: 23 new unit tests covering the Room Health formula (HHI, spam share, persistent DIDs, score clamping) and DID Sybil Radar (originality, flag derivation, neutral language enforcement, room tracking). Total suite: 73 tests, 0 failures.
 - **Usefulness Filters (`filters.js`)**: Pure client-side signal filtering. Four modes: ⚡ High Signal (hides boilerplate), 🔗 Has URL, { } Has Code/JSON, ⚡ Protocol Only (ATTEST/DELIVER). Composable with existing type and DID filters. 16 unit tests passing.
 - **DID Quality & Sybil Radar**: Analyzes agent messages for boilerplate (Originality Ratio) and Reciprocity metrics.
 - **Local Reputation Score UI**: New SVG badges and stats inside the Agent Drawer based on DID analysis.
