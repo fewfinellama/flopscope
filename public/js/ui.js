@@ -83,32 +83,57 @@ export async function openAgentDrawer(did) {
   try {
     let pubKeyHex = 'unknown';
     try {
+    
     const clientStats = state.didStats?.get(did);
     if (clientStats) {
-      let origRatioColor = "!bg-emerald-50/50 !border-emerald-200 dark:!bg-emerald-950/20 dark:!border-emerald-800/50";
-      if (clientStats.originalityScore < 0.5) origRatioColor = "!bg-rose-50/50 !border-rose-200 dark:!bg-rose-950/20 dark:!border-rose-800/50";
-      else if (clientStats.originalityScore < 0.8) origRatioColor = "!bg-amber-50/50 !border-amber-200 dark:!bg-amber-950/20 dark:!border-amber-800/50";
+      let origRatioColor = "bg-emerald-50 border-emerald-200 dark:bg-emerald-950/30 dark:border-emerald-800/60 border";
+      let origRatioText = "text-emerald-700 dark:text-emerald-400";
+      if (clientStats.originalityScore < 0.5) {
+        origRatioColor = "bg-rose-50 border-rose-200 dark:bg-rose-950/30 dark:border-rose-800/60 border";
+        origRatioText = "text-rose-700 dark:text-rose-400";
+      } else if (clientStats.originalityScore < 0.8) {
+        origRatioColor = "bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800/60 border";
+        origRatioText = "text-amber-700 dark:text-amber-400";
+      }
 
       let flagsHtml = "";
       clientStats.flags.forEach(flag => {
-        flagsHtml += `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-300 dark:border-amber-800/80 uppercase">${flag}</span>`;
+        if (flag === 'template-heavy') {
+          flagsHtml += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-400 border border-rose-300 dark:border-rose-800/80 uppercase"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>${flag}</span>`;
+        } else if (flag === 'one-shot') {
+          flagsHtml += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-300 dark:border-amber-800/80 uppercase"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${flag}</span>`;
+        } else if (flag === 'high-reciprocity') {
+          flagsHtml += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800/80 uppercase"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>${flag}</span>`;
+        } else if (flag === 'suspicious') {
+          flagsHtml += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-400 border border-rose-300 dark:border-rose-800/80 uppercase"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>${flag}</span>`;
+        } else {
+          flagsHtml += `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border border-slate-300 dark:border-slate-700 uppercase">${flag}</span>`;
+        }
       });
-      if (!flagsHtml) flagsHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700 uppercase">No Flags</span>`;
+      if (!flagsHtml) flagsHtml = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-500 border border-slate-200 dark:border-slate-800 uppercase"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>No Flags Triggered</span>`;
 
       document.getElementById("drawer-client-stats").innerHTML = `
-        <div class="space-y-2 pt-1">
+        <div class="space-y-3 pt-2">
           <h4 class="text-xs font-mono uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">Local Reputation Score</h4>
-          <div class="p-3.5 rounded-xl glass-panel shadow-sm flex items-center justify-between gap-3 ${origRatioColor}">
+          
+          <div class="p-4 rounded-xl flex items-center justify-between gap-3 ${origRatioColor}">
             <div class="flex-1 min-w-0">
               <span class="block text-slate-800 dark:text-slate-200 font-bold truncate">Originality Ratio</span>
               <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Based on n-gram similarity</span>
             </div>
-            <span class="font-bold text-cyan-700 dark:text-[#00c2ff] whitespace-nowrap text-xl font-mono">${(clientStats.originalityScore * 100).toFixed(0)}%</span>
+            <span class="font-bold whitespace-nowrap text-3xl font-mono ${origRatioText}">${(clientStats.originalityScore * 100).toFixed(0)}%</span>
           </div>
-          <div class="p-3.5 rounded-xl glass-panel shadow-sm !bg-indigo-50/30 !border-indigo-200 dark:!bg-indigo-950/20 dark:!border-indigo-800/50">
-             <span class="text-slate-500 dark:text-slate-400 text-[10px] font-mono font-bold uppercase tracking-wider block mb-2">Detected Flags</span>
+
+          <div class="p-4 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-900/50 dark:border-slate-800/80 border">
+             <span class="text-slate-500 dark:text-slate-400 text-[10px] font-mono font-bold uppercase tracking-wider block mb-3">Detected Flags</span>
              <div class="flex flex-wrap gap-2">
                ${flagsHtml}
+             </div>
+          </div>
+        </div>
+      `;
+    }
+
              </div>
           </div>
         </div>
@@ -131,20 +156,20 @@ export async function openAgentDrawer(did) {
     if (detailsEl) {
       detailsEl.innerHTML = `
         <!-- Public Key Breakdown -->
-        <div class="p-3.5 rounded-xl glass-panel shadow-sm !bg-slate-50/50 !border-slate-200 dark:!bg-slate-900/40 dark:!border-slate-800/60 space-y-1.5 font-mono text-xs">
+        <div class="p-4 rounded-xl bg-slate-50 border-slate-200 dark:bg-slate-900/50 dark:border-slate-800/80 border space-y-1.5 font-mono text-xs">
           <span class="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-xs">32-Byte Public Key (Hex)</span>
           <p class="text-slate-800 dark:text-slate-200 font-medium break-all select-all">${pubKeyHex}</p>
         </div>
 
         <!-- Lifetime Stats -->
         <div class="grid grid-cols-2 gap-3">
-          <div class="p-3.5 rounded-xl glass-panel shadow-sm !bg-violet-50/40 !border-violet-200 dark:!bg-violet-950/20 dark:!border-violet-800/50">
+          <div class="p-4 rounded-xl bg-indigo-50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-800/60 border">
             <span class="text-slate-500 dark:text-slate-400 text-xs font-mono font-semibold uppercase tracking-wider">Archived Msgs</span>
-            <p class="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">${(stats.total_messages || recentMessages.length).toLocaleString()}</p>
+            <p class="text-2xl font-bold font-mono text-indigo-700 dark:text-indigo-400 mt-1">${(stats.total_messages || recentMessages.length).toLocaleString()}</p>
           </div>
-          <div class="p-3.5 rounded-xl glass-panel shadow-sm !bg-cyan-50/40 !border-cyan-200 dark:!bg-cyan-950/20 dark:!border-cyan-800/50">
+          <div class="p-4 rounded-xl bg-cyan-50 border-cyan-200 dark:bg-cyan-950/30 dark:border-cyan-800/60 border">
             <span class="text-slate-500 dark:text-slate-400 text-xs font-mono font-semibold uppercase tracking-wider">Rooms Visited</span>
-            <p class="text-xl font-bold font-mono text-cyan-700 dark:text-[#00c2ff] mt-1">${stats.rooms_count || 1}</p>
+            <p class="text-2xl font-bold font-mono text-cyan-700 dark:text-[#00c2ff] mt-1">${stats.rooms_count || 1}</p>
           </div>
         </div>
 
