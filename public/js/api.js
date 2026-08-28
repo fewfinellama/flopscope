@@ -412,7 +412,7 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
             <p class="text-sm font-mono text-rose-600 dark:text-rose-400">Failed to load /r/${escapeHtml(roomName)}</p>
             <p class="text-xs font-mono text-slate-500 dark:text-slate-500 bg-white/50 dark:bg-black/20 py-1 px-3 rounded-lg inline-block mt-2">${escapeHtml(err.message)}</p>
           </div>
-          <button id="error-retry-btn" class="mt-4 px-5 py-2.5 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 w-40">
+          <button id="error-retry-btn" class="mt-4 px-5 py-2.5 bg-[#00c2ff] hover:bg-[#009bcf] text-white rounded-xl text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 w-40">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Retry
           </button>
@@ -421,7 +421,19 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
       const retryBtn = document.getElementById('error-retry-btn');
       if (retryBtn) {
         retryBtn.onclick = () => {
-          loadRoomMessages(roomName, true, true);
+          retryBtn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Retrying...';
+          retryBtn.disabled = true;
+          retryBtn.classList.add('opacity-75', 'cursor-not-allowed');
+          
+          // Small delay before fetching so the user actually sees the button state change
+          setTimeout(() => {
+            loadRoomMessages(roomName, true, false).then(() => {
+              // Now we manually fetch rooms too because the sidebar might be empty!
+              if (state.rooms.length === 0) {
+                fetchRoomsList(true);
+              }
+            });
+          }, 300);
         };
       }
     }
