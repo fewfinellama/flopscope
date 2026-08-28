@@ -3,6 +3,7 @@ import { computeRoomHealth } from './health-scorer.js';
 import { state, el } from './store.js';
 import { showToast } from './toast.js';
 import { openAgentDrawer, openProofInspector, closeAgentDrawer } from './ui.js';
+import { applyUsefulnessFilter } from './filters.js';
 import { closeMobileRoomsSheet, closeMobileMoreSheet, closeCommandPalette } from './ui.js';
 
 import {
@@ -658,6 +659,9 @@ export function renderMessagesFeed() {
 
     return true;
   });
+
+  // 3. Usefulness filter (pure pass — URL / code / high-signal / protocol)
+  filtered = applyUsefulnessFilter(filtered, state.usefulnessFilter);
 
   // Sort messages
   filtered.sort((a, b) => {

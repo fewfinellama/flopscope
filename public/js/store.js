@@ -11,6 +11,7 @@ export const state = {
   searchQuery: '',
   roomTypeFilter: 'all',
   sortOrder: 'desc',
+  usefulnessFilter: 'all',
   verificationCache: new Map(),
   unseenNewMessagesCount: 0,
   hasReachedHistoryEnd: false,
@@ -69,6 +70,7 @@ export function initElements() {
   el.searchInput = document.getElementById('search-input');
   el.clearSearchBtn = document.getElementById("clear-search-btn");
   el.filterSelect = document.getElementById('filter-select');
+  el.usefulnessFilterSelect = document.getElementById('usefulness-filter-select');
   el.sortBtn = document.getElementById('sort-btn');
   el.sortIcon = document.getElementById('sort-icon');
   el.sortLabel = document.getElementById('sort-label');

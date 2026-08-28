@@ -273,6 +273,13 @@ function initEventListeners() {
     };
   }
 
+  if (el.usefulnessFilterSelect) {
+    el.usefulnessFilterSelect.onchange = (e) => {
+      state.usefulnessFilter = e.target.value;
+      renderMessagesFeed();
+    };
+  }
+
   // Sort Button
   if (el.sortBtn) {
     el.sortBtn.onclick = () => {
