@@ -412,12 +412,18 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
             <p class="text-sm font-mono text-rose-600 dark:text-rose-400">Failed to load /r/${escapeHtml(roomName)}</p>
             <p class="text-xs font-mono text-slate-500 dark:text-slate-500 bg-white/50 dark:bg-black/20 py-1 px-3 rounded-lg inline-block mt-2">${escapeHtml(err.message)}</p>
           </div>
-          <button onclick="window.flopscope.loadRoomMessages('${escapeHtml(roomName)}', true, true)" class="mt-4 px-5 py-2.5 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 w-40">
+          <button id="error-retry-btn" class="mt-4 px-5 py-2.5 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 w-40">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Retry
           </button>
         </div>
       `;
+      const retryBtn = document.getElementById('error-retry-btn');
+      if (retryBtn) {
+        retryBtn.onclick = () => {
+          loadRoomMessages(roomName, true, true);
+        };
+      }
     }
   } finally {
     state.isLoading = false;
