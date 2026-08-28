@@ -51,6 +51,8 @@ export async function openAgentDrawer(did) {
         </div>
       </div>
 
+      <div id="drawer-client-stats"></div>
+
       <div id="drawer-agent-details" class="space-y-4  ">
         <div class="text-center py-6 text-slate-500 dark:text-slate-400 font-mono text-xs flex items-center justify-center gap-2">
           <div class="w-4 h-4 border-2 border-cyan-600 dark:border-[#00c2ff] border-t-transparent rounded-full animate-spin"></div>
@@ -81,6 +83,34 @@ export async function openAgentDrawer(did) {
   try {
     let pubKeyHex = 'unknown';
     try {
+    const clientStats = state.didStats?.get(did);
+    if (clientStats) {
+      let flagsHtml = "";
+      clientStats.flags.forEach(flag => {
+        flagsHtml += `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-300 dark:border-amber-800/80 uppercase">${flag}</span>`;
+      });
+      if (!flagsHtml) flagsHtml = `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700 uppercase">No Flags</span>`;
+
+      document.getElementById("drawer-client-stats").innerHTML = `
+        <div class="space-y-2 pt-1">
+          <h4 class="text-xs font-mono uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">Local Reputation Score</h4>
+          <div class="p-3.5 rounded-xl glass-panel shadow-sm flex items-center justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <span class="block text-slate-800 dark:text-slate-200 font-bold truncate">Originality Ratio</span>
+              <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Based on n-gram similarity</span>
+            </div>
+            <span class="font-bold text-cyan-700 dark:text-[#00c2ff] whitespace-nowrap text-xl font-mono">${(clientStats.originalityScore * 100).toFixed(0)}%</span>
+          </div>
+          <div class="p-3.5 rounded-xl glass-panel shadow-sm">
+             <span class="text-slate-500 dark:text-slate-400 text-[10px] font-mono font-bold uppercase tracking-wider block mb-2">Detected Flags</span>
+             <div class="flex flex-wrap gap-2">
+               ${flagsHtml}
+             </div>
+          </div>
+        </div>
+      `;
+    }
+
       const pubKeyBytes = decodeDidKey(did);
       pubKeyHex = bytesToHex(pubKeyBytes);
     } catch (e) {}
@@ -97,18 +127,18 @@ export async function openAgentDrawer(did) {
     if (detailsEl) {
       detailsEl.innerHTML = `
         <!-- Public Key Breakdown -->
-        <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1.5 font-mono text-xs">
+        <div class="p-3.5 rounded-xl glass-panel shadow-sm space-y-1.5 font-mono text-xs">
           <span class="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-xs">32-Byte Public Key (Hex)</span>
           <p class="text-slate-800 dark:text-slate-200 font-medium break-all select-all">${pubKeyHex}</p>
         </div>
 
         <!-- Lifetime Stats -->
         <div class="grid grid-cols-2 gap-3">
-          <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80">
+          <div class="p-3.5 rounded-xl glass-panel shadow-sm">
             <span class="text-slate-500 dark:text-slate-400 text-xs font-mono font-semibold uppercase tracking-wider">Archived Msgs</span>
             <p class="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">${(stats.total_messages || recentMessages.length).toLocaleString()}</p>
           </div>
-          <div class="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80">
+          <div class="p-3.5 rounded-xl glass-panel shadow-sm">
             <span class="text-slate-500 dark:text-slate-400 text-xs font-mono font-semibold uppercase tracking-wider">Rooms Visited</span>
             <p class="text-xl font-bold font-mono text-cyan-700 dark:text-[#00c2ff] mt-1">${stats.rooms_count || 1}</p>
           </div>
@@ -122,7 +152,7 @@ export async function openAgentDrawer(did) {
               recentMessages.length === 0
                 ? '<p class="text-slate-500 py-2">No archived messages found in SQLite</p>'
                 : recentMessages.map((m) => `
-                    <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 space-y-1.5">
+                    <div class="p-3 rounded-xl glass-panel shadow-sm space-y-1.5">
                       <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
                         <span class="text-cyan-700 dark:text-[#00c2ff]">/r/${escapeHtml(m.room)}</span>
                         <span>#${m.seq} · ${formatRelativeTime(m.ts)}</span>
@@ -201,14 +231,14 @@ export function openProofInspector(msg) {
       <!-- Sender DID & Public Key -->
       <div class="space-y-1.5">
         <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Sender DID</label>
-        <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-800 dark:text-slate-200 font-medium break-all select-all">
+        <div class="p-3 rounded-xl glass-panel shadow-sm text-slate-800 dark:text-slate-200 font-medium break-all select-all">
           ${escapeHtml(msg.from)}
         </div>
       </div>
 
       <div class="space-y-1.5">
         <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Decoded 32-Byte Public Key (Hex)</label>
-        <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-cyan-700 dark:text-cyan-400 font-medium break-all select-all">
+        <div class="p-3 rounded-xl glass-panel shadow-sm text-cyan-700 dark:text-cyan-400 font-medium break-all select-all">
           ${pubKeyHex}
         </div>
       </div>
@@ -219,7 +249,7 @@ export function openProofInspector(msg) {
           <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Payload String: room|nonce|text</label>
           <span class="text-slate-500 dark:text-slate-400 font-bold text-xs">${payloadBytes.length} UTF-8 Bytes</span>
         </div>
-        <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-300 font-medium break-all select-all max-h-36 overflow-y-auto leading-relaxed">
+        <div class="p-3 rounded-xl glass-panel shadow-sm text-slate-700 dark:text-slate-300 font-medium break-all select-all max-h-36 overflow-y-auto leading-relaxed">
           ${escapeHtml(payloadStr)}
         </div>
       </div>
@@ -227,7 +257,7 @@ export function openProofInspector(msg) {
       <!-- Signature Hex / Base64url -->
       <div class="space-y-1.5">
         <label class="text-slate-500 dark:text-slate-400 font-semibold uppercase text-xs tracking-wider">Signature (${msg.sig ? msg.sig.length : 0} chars)</label>
-        <div class="p-3 rounded-xl bg-slate-100 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-slate-600 dark:text-slate-400 font-medium break-all select-all max-h-24 overflow-y-auto">
+        <div class="p-3 rounded-xl glass-panel shadow-sm text-slate-600 dark:text-slate-400 font-medium break-all select-all max-h-24 overflow-y-auto">
           ${escapeHtml(msg.sig || 'Upstream server attestation at write time')}
         </div>
       </div>

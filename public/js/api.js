@@ -1,3 +1,4 @@
+import { analyzeDids } from './did-analyzer.js';
 import { computeRoomHealth } from './health-scorer.js';
 import { state, el } from './store.js';
 import { showToast } from './toast.js';
@@ -451,6 +452,7 @@ export function updateRoomStats() {
   const verifiedCount = Array.from(state.verificationCache.values()).filter((v) => v.valid).length;
   const velocity = calculateChatVelocity(state.messages);
   const metrics = computeRoomHealth(state.currentRoom, state.messages);
+  analyzeDids(state.currentRoom, state.messages);
   state.roomMetrics[state.currentRoom] = metrics;
   const healthPill = document.getElementById("health-pill-trigger");
   const healthText = document.getElementById("health-pill-text");

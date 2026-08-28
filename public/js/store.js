@@ -3,6 +3,7 @@ export const state = {
   messages: [],
   rooms: [],
   roomMetrics: {},
+  didStats: new Map(),
   pollingInterval: 10,
   pollingTimer: null,
   filter: 'all',
