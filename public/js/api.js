@@ -61,6 +61,8 @@ export function switchRoom(roomName, updateUrl = true) {
   }
 
   state.currentRoom = cleanName;
+  state.messages = []; // CRITICAL: Clear old room's messages!
+  state.verificationCache.clear(); // Clear cryptographic verification cache for the new room
   state.unseenNewMessagesCount = 0;
   state.hasReachedHistoryEnd = false;
   state.lastFetchedSeq = null;
