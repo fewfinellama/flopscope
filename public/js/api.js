@@ -452,8 +452,29 @@ export function updateRoomStats() {
   const velocity = calculateChatVelocity(state.messages);
   const metrics = computeRoomHealth(state.currentRoom, state.messages);
   state.roomMetrics[state.currentRoom] = metrics;
-  const statHealth = document.getElementById("stat-health");
-  if (statHealth) statHealth.innerHTML = `${metrics.healthScore}<span class="text-xs font-normal text-slate-500">%</span>`;
+  const healthPill = document.getElementById("health-pill-trigger");
+  const healthText = document.getElementById("health-pill-text");
+  if (healthPill && healthText) {
+    healthPill.classList.remove("hidden", "bg-emerald-50", "border-emerald-200", "text-emerald-700", "dark:bg-emerald-950/50", "dark:border-emerald-800", "dark:text-emerald-400", "bg-amber-50", "border-amber-200", "text-amber-700", "dark:bg-amber-950/50", "dark:border-amber-800", "dark:text-amber-400", "bg-rose-50", "border-rose-200", "text-rose-700", "dark:bg-rose-950/50", "dark:border-rose-800", "dark:text-rose-400", "bg-slate-50", "border-slate-200", "text-slate-700", "dark:bg-slate-900/50", "dark:border-slate-800", "dark:text-slate-400");
+    healthPill.classList.add("flex");
+    if (metrics.sampleSize < 10) {
+      healthPill.classList.add("bg-slate-50", "border-slate-200", "text-slate-700", "dark:bg-slate-900/50", "dark:border-slate-800", "dark:text-slate-400");
+      healthText.textContent = "Analyzing...";
+    } else {
+      let label = "";
+      if (metrics.healthScore >= 80) {
+        healthPill.classList.add("bg-emerald-50", "border-emerald-200", "text-emerald-700", "dark:bg-emerald-950/50", "dark:border-emerald-800", "dark:text-emerald-400", "shadow-emerald-500/10");
+        label = "Excellent";
+      } else if (metrics.healthScore >= 50) {
+        healthPill.classList.add("bg-amber-50", "border-amber-200", "text-amber-700", "dark:bg-amber-950/50", "dark:border-amber-800", "dark:text-amber-400", "shadow-amber-500/10");
+        label = "Moderate";
+      } else {
+        healthPill.classList.add("bg-rose-50", "border-rose-200", "text-rose-700", "dark:bg-rose-950/50", "dark:border-rose-800", "dark:text-rose-400", "shadow-rose-500/10");
+        label = "Poor";
+      }
+      healthText.textContent = `${metrics.healthScore}% Signal · ${label}`;
+    }
+  }
 
   if (el.statTotal) el.statTotal.textContent = total.toLocaleString();
   if (el.statSigned) el.statSigned.textContent = signedList.length.toLocaleString();

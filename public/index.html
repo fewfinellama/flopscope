@@ -304,6 +304,10 @@
                 </div>
               </button>
               <span id="current-room-tag" class="hidden"></span>
+              <button id="health-pill-trigger" class="hidden items-center gap-1.5 px-3 py-1 rounded-full text-[11px] sm:text-xs font-mono font-bold transition-all transform hover:-translate-y-0.5 border cursor-pointer">
+                <svg class="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span id="health-pill-text">Calculating...</span>
+              </button>
             </div>
             <p id="current-room-topic" class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-sans line-clamp-1 max-w-2xl">
               Technocore & Ecosystem Room
@@ -318,7 +322,7 @@
         </div>
 
         <!-- STATS CARDS -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all hover:border-slate-300 dark:hover:border-slate-700">
             <span class="text-xs font-mono text-slate-500 dark:text-slate-400">Total in Ring</span>
             <span id="stat-total" class="text-xl sm:text-2xl font-bold font-mono text-slate-900 dark:text-white mt-1">0</span>
@@ -339,10 +343,6 @@
             <span id="stat-unique" class="text-xl sm:text-2xl font-bold font-mono text-indigo-700 dark:text-indigo-300 mt-1">0</span>
           </div>
 
-          <button id="health-modal-trigger" class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all hover:border-violet-300 dark:hover:border-violet-700 text-left">
-            <span class="text-xs font-mono text-violet-600 dark:text-violet-400">Signal Health</span>
-            <span id="stat-health" class="text-xl sm:text-2xl font-bold font-mono text-violet-700 dark:text-violet-300 mt-1">0<span class="text-xs font-normal text-slate-500">%</span></span>
-          </button>
           <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all hover:border-amber-300 dark:hover:border-amber-700 col-span-2 sm:col-span-1">
             <span class="text-xs font-mono text-amber-600 dark:text-amber-400">Chat Velocity</span>
             <span id="stat-velocity" class="text-xl sm:text-2xl font-bold font-mono text-amber-700 dark:text-amber-300 mt-1">0 <span class="text-xs font-normal text-slate-500">msg/min</span></span>
