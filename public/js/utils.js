@@ -143,3 +143,21 @@ export async function copyToClipboard(text, onSuccess) {
     }
   }
 }
+
+/**
+ * Trigger a JSON file download.
+ * @param {Array<object>} data - Data to export
+ * @param {string} filename - Target filename
+ */
+export function exportDataAsJson(data, filename = 'export.json') {
+  const jsonStr = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}

@@ -4,6 +4,9 @@ import { state, el } from './store.js';
 import { showToast } from './toast.js';
 import { openAgentDrawer, openProofInspector, closeAgentDrawer } from './ui.js';
 import { applyUsefulnessFilter } from './filters.js';
+import { runProbes } from './protocol-probes.js';
+import { saveRoomSnapshot, getRoomSnapshots, generateSparklineSvg } from './snapshots.js';
+import { isBoilerplate } from './farming-patterns.js';
 import { closeMobileRoomsSheet, closeMobileMoreSheet, closeCommandPalette } from './ui.js';
 
 import {
@@ -29,6 +32,7 @@ import {
   formatExactTime,
   calculateChatVelocity,
   copyToClipboard,
+  exportDataAsJson,
 } from './utils.js';
 
 export function getRoomFromUrl() {
@@ -205,6 +209,12 @@ export function renderRoomsList() {
     const filtered = state.rooms.filter((r) => {
       const matchesSearch = r.name.toLowerCase().includes(desktopSearch) || (r.topic && r.topic.toLowerCase().includes(desktopSearch));
       return matchesSearch && matchesTypeFilter(r.name);
+    }).sort((a, b) => {
+      const aPinned = state.pinnedRooms && state.pinnedRooms.has(a.name);
+      const bPinned = state.pinnedRooms && state.pinnedRooms.has(b.name);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      return 0;
     });
 
     if (filtered.length === 0) {
@@ -236,6 +246,12 @@ export function renderRoomsList() {
     const filtered = state.rooms.filter((r) => {
       const matchesSearch = r.name.toLowerCase().includes(mobileSearch) || (r.topic && r.topic.toLowerCase().includes(mobileSearch));
       return matchesSearch && matchesTypeFilter(r.name);
+    }).sort((a, b) => {
+      const aPinned = state.pinnedRooms && state.pinnedRooms.has(a.name);
+      const bPinned = state.pinnedRooms && state.pinnedRooms.has(b.name);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      return 0;
     });
 
     if (filtered.length === 0) {
@@ -264,43 +280,84 @@ export function renderRoomsList() {
 
   // Attach click listeners to room buttons
   document.querySelectorAll('.room-nav-btn').forEach((btn) => {
-    btn.onclick = () => {
+    btn.onclick = (e) => {
+      e.preventDefault();
       const room = btn.dataset.room;
       if (room) switchRoom(room);
     };
   });
+
+  // Attach click listeners to pin buttons
+  document.querySelectorAll('.pin-room-btn').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const room = btn.dataset.pinRoom;
+      if (!room) return;
+      
+      if (!state.pinnedRooms) state.pinnedRooms = new Set();
+      
+      if (state.pinnedRooms.has(room)) {
+        state.pinnedRooms.delete(room);
+      } else {
+        state.pinnedRooms.add(room);
+      }
+      
+      localStorage.setItem('flopscope_pinned_rooms', JSON.stringify([...state.pinnedRooms]));
+      renderRoomsList();
+    };
+  });
 }
 
-export function createRoomButtonHtml(r) {
+export function createRoomButtonHtml(r, isMobile = false) {
   const isActive = r.name === state.currentRoom;
+  const isPinned = state.pinnedRooms && state.pinnedRooms.has(r.name);
+  
   const activeClass = isActive
     ? 'bg-cyan-500/15 border-cyan-500/40 text-[#00c2ff] font-semibold'
+    : isPinned
+    ? 'bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400 font-medium'
     : 'bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300';
 
+  const pinIconColor = isPinned ? 'text-amber-500' : 'text-slate-300 dark:text-slate-600 hover:text-amber-500';
+
   return `
-    <button
-      data-room="${escapeHtml(r.name)}"
-      class="room-nav-btn w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700/80 text-left transition-all duration-150 flex flex-col gap-1.5 ${activeClass}"
-    >
-      <div class="flex items-center justify-between gap-2">
-        <span class="font-mono text-sm tracking-tight truncate flex items-center gap-1.5">
-          <span class="text-cyan-500 dark:text-[#00c2ff] font-bold">/r/</span>${escapeHtml(r.name)}
-        </span>
-        <span class="text-[11px] font-mono text-slate-400 dark:text-slate-500 flex-shrink-0">
-          ${escapeHtml(r.age || 'live')}
-        </span>
-      </div>
-      ${
-        r.topic
-          ? `<p class="text-xs text-slate-500 dark:text-slate-400 truncate">${escapeHtml(r.topic)}</p>`
-          : ''
-      }
-      <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400 dark:text-slate-500 pt-0.5">
-        <span>seq ${r.seq || 0}</span>
-        <span>·</span>
-        <span>${r.size || '0B'}</span>
-      </div>
-    </button>
+    <div class="group relative block w-full">
+      <button
+        data-room="${escapeHtml(r.name)}"
+        class="room-nav-btn w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700/80 text-left transition-all duration-150 flex flex-col gap-1.5 ${activeClass}"
+      >
+        <div class="flex items-start justify-between gap-2 w-full">
+          <div class="flex flex-col gap-1 min-w-0">
+            <span class="font-mono text-sm tracking-tight truncate flex items-center gap-1.5">
+              <span class="${isActive ? 'text-cyan-500 dark:text-[#00c2ff]' : 'text-slate-400 dark:text-slate-500'} font-bold">/r/</span>${escapeHtml(r.name)}
+            </span>
+            <span class="text-[11px] font-mono text-slate-400 dark:text-slate-500 flex-shrink-0">
+              ${escapeHtml(r.age || 'live')}
+            </span>
+          </div>
+          <div class="flex-shrink-0">
+            <div
+              data-pin-room="${escapeHtml(r.name)}" 
+              class="pin-room-btn p-1.5 -m-1.5 rounded-lg transition-all cursor-pointer ${pinIconColor}" 
+              title="${isPinned ? 'Unpin Room' : 'Pin Room'}"
+            >
+              <svg class="w-4 h-4" fill="${isPinned ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        ${
+          r.topic
+            ? `<p class="text-xs text-slate-500 dark:text-slate-400 truncate w-full mt-0.5">${escapeHtml(r.topic)}</p>`
+            : ''
+        }
+        <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400 dark:text-slate-500 pt-0.5">
+          <span>seq ${r.seq || 0}</span>
+        </div>
+      </button>
+    </div>
   `;
 }
 
@@ -370,7 +427,8 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
       const incomingHighestSeq = Math.max(...incomingMessages.map((m) => m.seq || 0));
 
       if (incomingHighestSeq > currentHighestSeq) {
-        const newCount = incomingMessages.filter((m) => (m.seq || 0) > currentHighestSeq).length;
+        const newMessages = incomingMessages.filter((m) => (m.seq || 0) > currentHighestSeq);
+        const newCount = newMessages.length;
         const isNearTop = window.scrollY < 200;
 
         if (!isNearTop) {
@@ -378,6 +436,24 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
           if (el.newMessagesPill && el.newMessagesCount) {
             el.newMessagesCount.textContent = `${state.unseenNewMessagesCount} new message${state.unseenNewMessagesCount > 1 ? 's' : ''}`;
             el.newMessagesPill.classList.remove('hidden');
+          }
+        }
+
+        // Check for Watched DIDs
+        if (state.watchedDids && state.watchedDids.size > 0) {
+          for (const msg of newMessages) {
+            const did = msg.from || msg.did;
+            if (did && state.watchedDids.has(did) && !isBoilerplate(msg.text || '')) {
+              const shortDid = truncateDid(did);
+              const txt = (msg.text || '').substring(0, 40) + '...';
+              showToast(`👀 ${shortDid} posted: "${txt}"`);
+              if (Notification.permission === 'granted') {
+                new Notification(`Watched DID: ${shortDid}`, {
+                  body: msg.text || '',
+                  icon: '/favicon.ico'
+                });
+              }
+            }
           }
         }
       }
@@ -394,6 +470,21 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
 
     // Trigger background signature verifications
     verifyAllPendingSignatures();
+
+    // Run protocol probes — throttled to every 10 successful polls to protect CPU
+    state._probeCounter = (state._probeCounter || 0) + 1;
+    if (state._probeCounter % 10 === 1 || isInitial) {
+      const prevCount = state.lastPollMessageCount;
+      const newCount = incomingMessages.length;
+      state.lastPollMessageCount = newCount;
+      const newSinceLastPoll = prevCount !== null ? Math.max(0, newCount - (prevCount || 0)) : null;
+      state.protocolHealth = runProbes({
+        messages: state.messages,
+        room: roomName,
+        newMessagesSinceLastPoll: newSinceLastPoll,
+      });
+      updateProtocolPill();
+    }
 
     if (forceRefresh) {
       showToast(`Refreshed /r/${roomName}`);
@@ -521,6 +612,150 @@ export async function loadOlderHistory() {
 }
 
 // ==========================================
+// PROTOCOL HEALTH PILL
+// ==========================================
+
+export function updateProtocolPill() {
+  const health = state.protocolHealth;
+  if (!health || !el.protocolPill) return;
+
+  const failCount = health.probes.filter(p => p.status === 'fail').length;
+  const isOk = failCount === 0;
+  const isDegraded = failCount > 0;
+
+  // Update dot color
+  if (el.protocolPillDot) {
+    el.protocolPillDot.className = `w-2 h-2 rounded-full ${
+      isOk ? 'bg-emerald-400' : isDegraded ? 'bg-amber-400' : 'bg-slate-400'
+    }`;
+  }
+
+  // Update label
+  if (el.protocolPillStatus) {
+    el.protocolPillStatus.textContent = isOk ? 'Protocol OK' : `Protocol Degraded`;
+  }
+
+  // Update pill color
+  el.protocolPill.className = el.protocolPill.className
+    .replace(/text-\w+-\d+/g, '')
+    .replace(/border-\w+-\d+/g, '');
+
+  if (isOk) {
+    el.protocolPill.classList.add('text-emerald-700', 'dark:text-emerald-400', 'border-emerald-200', 'dark:border-emerald-800/60');
+    el.protocolPill.classList.remove('text-amber-700', 'dark:text-amber-400', 'border-amber-200', 'dark:border-amber-800/60');
+  } else {
+    el.protocolPill.classList.add('text-amber-700', 'dark:text-amber-400', 'border-amber-200', 'dark:border-amber-800/60');
+    el.protocolPill.classList.remove('text-emerald-700', 'dark:text-emerald-400', 'border-emerald-200', 'dark:border-emerald-800/60');
+  }
+
+  // Make visible (hidden until first probe run)
+  el.protocolPill.classList.remove('hidden');
+}
+
+export function openProtocolHealthModal() {
+  const health = state.protocolHealth;
+  if (!el.modalOverlay || !el.modalContainer) return;
+
+  const probeRows = health
+    ? health.probes.map(probe => {
+        const icon = probe.status === 'pass'
+          ? `<svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`
+          : probe.status === 'fail'
+          ? `<svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>`
+          : `<svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01"/></svg>`;
+
+        const statusColor = probe.status === 'pass'
+          ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
+          : probe.status === 'fail'
+          ? 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50'
+          : 'text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800';
+
+        return `
+          <div class="p-3 rounded-xl border ${statusColor} space-y-1">
+            <div class="flex items-center gap-2">
+              ${icon}
+              <span class="font-mono font-bold text-xs tracking-wide uppercase">${probe.name}</span>
+              <span class="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full ${probe.status === 'pass' ? 'bg-emerald-100 dark:bg-emerald-900/40' : probe.status === 'fail' ? 'bg-amber-100 dark:bg-amber-900/40' : 'bg-slate-200 dark:bg-slate-800'}">${probe.status}</span>
+            </div>
+            <p class="text-xs leading-relaxed pl-6 text-slate-600 dark:text-slate-400 font-sans">${probe.detail || ''}</p>
+          </div>`;
+      }).join('')
+    : `<p class="text-slate-400 text-sm text-center py-6">No probe results yet. Results appear after the first successful poll.</p>`;
+
+  const overallStatus = health?.status || 'unknown';
+  const overallColor = overallStatus === 'ok'
+    ? 'text-emerald-600 dark:text-emerald-400'
+    : overallStatus === 'degraded'
+    ? 'text-amber-600 dark:text-amber-400'
+    : 'text-slate-500';
+
+  const lastRunText = health?.lastRun
+    ? `Last run ${Math.round((Date.now() - health.lastRun) / 1000)}s ago`
+    : 'Not yet run';
+
+  el.modalContainer.innerHTML = `
+    <div class="p-5 sm:p-6 space-y-5 text-slate-800 dark:text-slate-200">
+
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 ${overallColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">Protocol Health Monitor</h3>
+        </div>
+        <button id="modal-close-btn" class="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 transition-colors rounded-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">${lastRunText}</p>
+          <p class="text-lg font-bold font-mono ${overallColor} mt-0.5">Overall: ${overallStatus.toUpperCase()}</p>
+        </div>
+        <button id="run-probes-btn" class="px-4 py-2 bg-[#00c2ff] hover:bg-[#009bcf] text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Run Now
+        </button>
+      </div>
+
+      <div class="space-y-2.5">
+        <h4 class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Probe Results</h4>
+        ${probeRows}
+      </div>
+
+      <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans text-center pt-2">
+        Probes are read-only and diagnostic — never accusatory. Failures are signals, not verdicts.
+      </p>
+    </div>
+  `;
+
+  el.modalOverlay.classList.remove('hidden');
+  el.modalOverlay.classList.add('flex');
+
+  const closeBtn = document.getElementById('modal-close-btn');
+  if (closeBtn) closeBtn.onclick = () => { import('./ui.js').then(m => m.closeModal()); };
+
+  const runBtn = document.getElementById('run-probes-btn');
+  if (runBtn) {
+    runBtn.onclick = () => {
+      runBtn.disabled = true;
+      runBtn.innerHTML = `<svg class="w-3.5 h-3.5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Running...`;
+      
+      setTimeout(() => {
+        state.protocolHealth = runProbes({
+          messages: state.messages,
+          room: state.currentRoom,
+          newMessagesSinceLastPoll: state.lastPollMessageCount,
+        });
+        updateProtocolPill();
+        openProtocolHealthModal(); // re-render with fresh results
+      }, 150);
+    };
+  }
+}
+
+// ==========================================
 // STATS & VELOCITY CALCULATIONS
 // ==========================================
 export function updateRoomStats() {
@@ -532,28 +767,62 @@ export function updateRoomStats() {
   const metrics = computeRoomHealth(state.currentRoom, state.messages);
   analyzeDids(state.currentRoom, state.messages);
   state.roomMetrics[state.currentRoom] = metrics;
+  
+  // Save snapshot and draw sparkline
+  saveRoomSnapshot(metrics);
+  const snapshots = getRoomSnapshots(state.currentRoom);
+  
   const healthPill = document.getElementById("health-pill-trigger");
   const healthText = document.getElementById("health-pill-text");
+  
+  let label = "Analyzing...";
+  let colorClass = "text-slate-600 dark:text-slate-400";
+  let sparklineColor = "text-slate-400";
+  
+  if (metrics.sampleSize >= 10) {
+    if (metrics.healthScore >= 80) {
+      label = "Excellent";
+      colorClass = "text-emerald-700 dark:text-emerald-300";
+      sparklineColor = "text-emerald-500";
+    } else if (metrics.healthScore >= 50) {
+      label = "Moderate";
+      colorClass = "text-amber-700 dark:text-amber-300";
+      sparklineColor = "text-amber-500";
+    } else {
+      label = "Poor";
+      colorClass = "text-rose-700 dark:text-rose-300";
+      sparklineColor = "text-rose-500";
+    }
+  }
+
+  // Update Header Pill
   if (healthPill && healthText) {
-    healthPill.classList.remove("hidden", "bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "bg-slate-100", "border-slate-200", "text-slate-600", "dark:bg-slate-800", "dark:border-slate-700", "dark:text-slate-400");
+    healthPill.classList.remove("hidden", "bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "bg-slate-100", "border-slate-200", "text-slate-600", "dark:bg-slate-800", "dark:border-slate-700", "dark:text-slate-400", "shadow-emerald-500/10", "shadow-amber-500/10", "shadow-rose-500/10");
     healthPill.classList.add("flex");
+    
     if (metrics.sampleSize < 10) {
       healthPill.classList.add("bg-slate-100", "border-slate-200", "text-slate-600", "dark:bg-slate-800", "dark:border-slate-700", "dark:text-slate-400");
       healthText.textContent = "Analyzing...";
     } else {
-      let label = "";
-      if (metrics.healthScore >= 80) {
-        healthPill.classList.add("bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "shadow-emerald-500/10");
-        label = "Excellent";
-      } else if (metrics.healthScore >= 50) {
-        healthPill.classList.add("bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "shadow-amber-500/10");
-        label = "Moderate";
-      } else {
-        healthPill.classList.add("bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "shadow-rose-500/10");
-        label = "Poor";
-      }
+      if (metrics.healthScore >= 80) healthPill.classList.add("bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "shadow-emerald-500/10");
+      else if (metrics.healthScore >= 50) healthPill.classList.add("bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "shadow-amber-500/10");
+      else healthPill.classList.add("bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "shadow-rose-500/10");
+      
       healthText.textContent = `${metrics.healthScore}% Signal · ${label}`;
     }
+  }
+  
+  // Update Health Metric Card
+  if (el.statHealthCard) {
+    el.statHealthCard.onclick = () => openHealthTransparencyModal();
+  }
+  if (el.statHealth) {
+    el.statHealth.className = `text-xl sm:text-2xl font-bold font-mono mt-1 z-10 transition-colors ${colorClass}`;
+    el.statHealth.textContent = metrics.sampleSize < 10 ? '--' : `${metrics.healthScore}%`;
+  }
+  
+  if (el.healthSparkline) {
+    el.healthSparkline.innerHTML = generateSparklineSvg(snapshots, 60, 24, sparklineColor);
   }
 
   if (el.statTotal) el.statTotal.textContent = total.toLocaleString();
@@ -684,11 +953,21 @@ export function renderMessagesFeed() {
     `;
   }
 
+  if (el.filterCount) {
+    el.filterCount.innerText = `Showing ${filtered.length} of ${state.messages.length}`;
+  }
+
+  if (el.exportBtn) {
+    el.exportBtn.onclick = () => {
+      exportDataAsJson(filtered, `flopscope_${state.currentRoom}_export.json`);
+    };
+  }
+
   if (filtered.length === 0) {
     html += `
       <div class="text-center py-16 px-4 rounded-2xl glass-panel text-slate-400 font-mono text-sm space-y-2">
-        <svg class="w-8 h-8 text-slate-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        <svg class="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p class="font-bold text-slate-600 dark:text-slate-300">No messages match your criteria</p>
         <p class="text-xs text-slate-500">Try clearing your search query or changing filter options</p>
@@ -936,4 +1215,91 @@ export function jumpToMessage(room, seq) {
       showToast(`Message #${seq} is too old to be in the recent feed. Load more history first.`);
     }
   }
+}
+
+
+export function openHealthTransparencyModal() {
+  const metrics = state.roomMetrics[state.currentRoom];
+  if (!metrics) return;
+
+  const titleColor = metrics.healthScore >= 80 ? 'text-emerald-600 dark:text-emerald-400' 
+    : metrics.healthScore >= 50 ? 'text-amber-600 dark:text-amber-400' 
+    : 'text-rose-600 dark:text-rose-400';
+
+  el.modalContainer.innerHTML = `
+    <div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
+      <h3 class="text-base font-bold font-mono text-slate-800 dark:text-slate-100 flex items-center gap-2">
+        <svg class="w-5 h-5 ${titleColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Room Health Scoring (v1)
+      </h3>
+      <button id="modal-close-btn" class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors p-1 rounded-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    
+    <div class="p-4 sm:p-5 overflow-y-auto max-h-[80vh] space-y-6">
+      
+      <div class="bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 p-4 text-center">
+        <div class="text-sm font-mono text-slate-500 dark:text-slate-400 mb-1">Current Health Score</div>
+        <div class="text-5xl font-bold font-mono ${titleColor}">${metrics.sampleSize < 10 ? '--' : metrics.healthScore}</div>
+        <div class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-2">Based on the last ${metrics.sampleSize} messages</div>
+      </div>
+      
+      <div class="space-y-3">
+        <h4 class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Formula Breakdown</h4>
+        <div class="bg-slate-100/50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-200 dark:divide-slate-800 text-sm font-mono">
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Spam Penalty</span> (Max 35)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">${Math.round(metrics.spamShare*100)}% of messages matched farming patterns</div>
+            </div>
+            <div class="font-bold text-rose-500 dark:text-rose-400">-${metrics.breakdown.spamPenalty || 0}</div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Signal Bonus</span> (Max 25)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">${Math.round(metrics.signalShare*100)}% had meaningful length or links</div>
+            </div>
+            <div class="font-bold text-emerald-500 dark:text-emerald-400">+${metrics.breakdown.signalBonus || 0}</div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Concentration Penalty</span> (Max 20)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">Herfindahl Index: ${metrics.authorConcentration.toFixed(2)} (1.0 = single author)</div>
+            </div>
+            <div class="font-bold text-amber-500 dark:text-amber-400">-${metrics.breakdown.concentrationPenalty || 0}</div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Reciprocity Bonus</span> (Max 15)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">${Math.round(metrics.reciprocity*100)}% of messages were replied to</div>
+            </div>
+            <div class="font-bold text-emerald-500 dark:text-emerald-400">+${metrics.breakdown.reciprocityBonus || 0}</div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Persistence Bonus</span> (Max 5)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">${metrics.uniquePersistentDids} DIDs with >= 2 messages</div>
+            </div>
+            <div class="font-bold text-emerald-500 dark:text-emerald-400">+${metrics.breakdown.persistenceBonus || 0}</div>
+          </div>
+          
+        </div>
+      </div>
+      
+      <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans text-center">
+        The Health Score is a read-only diagnostic signal, not a moral judgment.
+      </p>
+    </div>
+  `;
+
+  el.modalOverlay.classList.remove('hidden');
+  el.modalOverlay.classList.add('flex');
+  const closeBtn = document.getElementById('modal-close-btn');
+  if (closeBtn) closeBtn.onclick = () => { import('./ui.js').then(m => m.closeModal()); };
 }

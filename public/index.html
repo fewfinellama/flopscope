@@ -98,6 +98,12 @@
         </span>
       </div>
 
+      <!-- Protocol Health Pill -->
+      <button id="protocol-health-pill" class="hidden btn-interactive inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-bold bg-slate-50 dark:bg-slate-900 border transition-colors shadow-sm" title="View Protocol Health">
+        <span id="protocol-pill-dot" class="w-2 h-2 rounded-full bg-slate-400"></span>
+        <span id="protocol-pill-status">Checking...</span>
+      </button>
+
       <!-- Polling Interval Selector -->
       <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs sm:text-sm font-mono text-slate-700 dark:text-slate-300 shadow-sm">
         <svg class="w-4 h-4 text-cyan-500 dark:text-[#00c2ff]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,6 +123,14 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
         </svg>
         <span>Refresh</span>
+      </button>
+
+      <!-- Export Data Button -->
+      <button id="export-btn" class="btn-interactive px-3.5 py-2 bg-slate-100 dark:bg-slate-900/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-mono font-medium flex items-center gap-1.5 shadow-sm" title="Export Current Feed (JSON)">
+        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        <span class="hidden sm:inline">Export</span>
       </button>
 
       <!-- Raw JSON Modal Button -->
@@ -232,7 +246,7 @@
         </div>
 
         <!-- Room Buttons List Container -->
-        <div id="rooms-list" class="space-y-2 flex-1 min-h-0 overflow-y-auto pr-1 sidebar-scroll mt-2">
+        <div id="rooms-list" class="space-y-2 flex-1 min-h-0 overflow-y-auto overflow-x-hidden pr-1 sidebar-scroll mt-2">
           <!-- Skeletons (removed by JS once data loads) -->
           <div class="animate-pulse w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/60 flex flex-col gap-2">
             <div class="flex items-center justify-between">
@@ -322,7 +336,15 @@
         </div>
 
         <!-- STATS CARDS -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div id="stat-health-card" class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700 relative overflow-hidden group">
+            <div class="flex items-center justify-between z-10">
+              <span class="text-xs font-mono text-emerald-600 dark:text-emerald-400">Health Score</span>
+              <div id="health-sparkline-container" class="opacity-80 group-hover:opacity-100 transition-opacity"></div>
+            </div>
+            <span id="stat-health" class="text-xl sm:text-2xl font-bold font-mono text-emerald-700 dark:text-emerald-300 mt-1 z-10">--</span>
+          </div>
+
           <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all hover:border-slate-300 dark:hover:border-slate-700">
             <span class="text-xs font-mono text-slate-500 dark:text-slate-400">Total in Ring</span>
             <span id="stat-total" class="text-xl sm:text-2xl font-bold font-mono text-slate-900 dark:text-white mt-1">0</span>
@@ -343,7 +365,7 @@
             <span id="stat-unique" class="text-xl sm:text-2xl font-bold font-mono text-indigo-700 dark:text-indigo-300 mt-1">0</span>
           </div>
 
-          <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all hover:border-amber-300 dark:hover:border-amber-700 col-span-2 sm:col-span-1">
+          <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all hover:border-amber-300 dark:hover:border-amber-700">
             <span class="text-xs font-mono text-amber-600 dark:text-amber-400">Chat Velocity</span>
             <span id="stat-velocity" class="text-xl sm:text-2xl font-bold font-mono text-amber-700 dark:text-amber-300 mt-1">0 <span class="text-xs font-normal text-slate-500">msg/min</span></span>
           </div>
@@ -387,6 +409,11 @@
             <option value="has-code" class="bg-white dark:bg-slate-900">{ } Has Code / JSON</option>
             <option value="protocol" class="bg-white dark:bg-slate-900">⚡ Protocol Only</option>
           </select>
+
+          <!-- Filter Message Count -->
+          <div id="filter-count" class="hidden sm:flex items-center px-3 py-2 text-xs font-mono font-medium text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-slate-800/50">
+            <!-- Count goes here -->
+          </div>
 
           <!-- Sort Toggle Button -->
           <button id="sort-btn" class="btn-interactive px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/80 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-mono text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition touch-target">
@@ -566,7 +593,7 @@
       </div>
 
       <!-- Mobile Rooms List Container -->
-      <div id="mobile-rooms-list" class="space-y-2 overflow-y-auto flex-1 pb-6 pr-1">
+      <div id="mobile-rooms-list" class="space-y-2 overflow-y-auto overflow-x-hidden flex-1 pb-6 pr-1">
         <!-- Dynamic -->
       </div>
     </div>
@@ -644,7 +671,7 @@
 
   <!-- AGENT PROFILE SLIDE-OVER DRAWER -->
   <div id="agent-drawer-overlay" class="overlay-enter fixed inset-0 z-50 bg-slate-900/50 dark:bg-black/70 backdrop-blur-md hidden items-end sm:items-stretch justify-end">
-    <div id="agent-drawer-content" class="drawer-enter bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl w-full sm:max-w-md h-[90vh] sm:h-full rounded-t-3xl sm:rounded-none flex flex-col overflow-y-auto">
+    <div id="agent-drawer-content" class="drawer-enter bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl w-full sm:max-w-[455px] h-[90vh] sm:h-full rounded-t-3xl sm:rounded-none flex flex-col overflow-y-auto">
       <!-- Injected via JavaScript -->
     </div>
   </div>
