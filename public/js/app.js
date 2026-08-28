@@ -7,6 +7,7 @@ import { state, el, initElements } from './store.js';
 import { showToast } from './toast.js';
 import { initTheme, toggleTheme } from './theme.js';
 import { 
+import { openHealthModal } from "./health-modal.js";
   getRoomFromUrl, 
   switchRoom, 
   loadRoomMessages, 
@@ -285,6 +286,8 @@ function initEventListeners() {
 // ==========================================
 export async function initApp() {
   initElements();
+  const healthBtn = document.getElementById("health-modal-trigger");
+  if (healthBtn) healthBtn.addEventListener("click", openHealthModal);
   initTheme();
   initEventListeners();
 
