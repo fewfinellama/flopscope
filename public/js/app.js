@@ -12,7 +12,8 @@ import {
   switchRoom, 
   loadRoomMessages, 
   fetchRoomsList, 
-  loadOlderHistory, 
+  loadOlderHistory,
+  jumpToMessage, 
   renderMessagesFeed, 
   renderRoomsList,
   updateRoomHeaderInfo
@@ -62,6 +63,22 @@ function setPollingInterval(seconds) {
 // EVENT LISTENERS INITIALIZATION
 // ==========================================
 function initEventListeners() {
+  // Scroll to Top FAB Logic
+  const scrollTopBtn = document.getElementById('scroll-to-top-btn');
+  if (scrollTopBtn) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) {
+        scrollTopBtn.classList.remove('translate-y-16', 'opacity-0');
+      } else {
+        scrollTopBtn.classList.add('translate-y-16', 'opacity-0');
+      }
+    });
+    
+    scrollTopBtn.onclick = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  }
+
   // Theme Toggles
   if (el.themeToggleBtn) el.themeToggleBtn.onclick = toggleTheme;
   if (el.mobileThemeToggleBtn) el.mobileThemeToggleBtn.onclick = toggleTheme;
@@ -334,6 +351,7 @@ window.flopscope = {
   loadRoomMessages,
   fetchRoomsList,
   loadOlderHistory,
+  jumpToMessage,
   openCryptoStudio,
   openAgentDrawer,
   openProofInspector,

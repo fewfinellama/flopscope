@@ -2,7 +2,7 @@ import { analyzeDids } from './did-analyzer.js';
 import { computeRoomHealth } from './health-scorer.js';
 import { state, el } from './store.js';
 import { showToast } from './toast.js';
-import { openAgentDrawer, openProofInspector } from './ui.js';
+import { openAgentDrawer, openProofInspector, closeAgentDrawer } from './ui.js';
 import { closeMobileRoomsSheet, closeMobileMoreSheet, closeCommandPalette } from './ui.js';
 
 import {
@@ -872,4 +872,32 @@ export function attachCardEventListeners() {
       }
     });
   }, 50);
+}\n
+export function jumpToMessage(room, seq) {
+  closeAgentDrawer();
+
+  if (state.currentRoom !== room) {
+    switchRoom(room);
+    // Poll every 100ms until the message card is rendered
+    let attempts = 0;
+    const checkExist = setInterval(() => {
+      const el = document.getElementById(`msg-${seq}`);
+      if (el || attempts > 20) {
+        clearInterval(checkExist);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('ring-2', 'ring-[#00c2ff]');
+          setTimeout(() => el.classList.remove('ring-2', 'ring-[#00c2ff]'), 2000);
+        }
+      }
+      attempts++;
+    }, 100);
+  } else {
+    const el = document.getElementById(`msg-${seq}`);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-2', 'ring-[#00c2ff]');
+      setTimeout(() => el.classList.remove('ring-2', 'ring-[#00c2ff]'), 2000);
+    }
+  }
 }

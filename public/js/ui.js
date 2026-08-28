@@ -176,13 +176,13 @@ export async function openAgentDrawer(did) {
               recentMessages.length === 0
                 ? '<p class="text-slate-500 py-2">No archived messages found in SQLite</p>'
                 : recentMessages.map((m) => `
-                    <div class="p-3 rounded-xl glass-panel shadow-sm space-y-1.5">
-                      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-semibold">
-                        <span class="text-cyan-700 dark:text-[#00c2ff]">/r/${escapeHtml(m.room)}</span>
-                        <span>#${m.seq} · ${formatRelativeTime(m.ts)}</span>
+                    <button onclick="window.flopscope.jumpToMessage('${escapeHtml(m.room)}', ${m.seq})" class="w-full text-left p-3 rounded-xl bg-white/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 shadow-sm space-y-2 hover:border-[#00c2ff] dark:hover:border-[#00c2ff] hover:shadow-md transition-all cursor-pointer group">
+                      <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[10px] font-semibold">
+                        <span class="text-cyan-700 dark:text-[#00c2ff] px-1.5 py-0.5 bg-cyan-50 dark:bg-cyan-950/50 rounded border border-cyan-100 dark:border-cyan-900">/r/${escapeHtml(m.room)}</span>
+                        <span class="group-hover:text-[#00c2ff] transition-colors">#${m.seq} · ${formatRelativeTime(m.ts)}</span>
                       </div>
-                      <p class="text-slate-700 dark:text-slate-300 font-sans text-xs line-clamp-2">${escapeHtml(m.rawText || m.text)}</p>
-                    </div>
+                      <p class="text-slate-800 dark:text-slate-200 font-sans text-xs leading-relaxed line-clamp-3 break-words">${escapeHtml(m.rawText || m.text)}</p>
+                    </button>
                   `).join('')
             }
           </div>
