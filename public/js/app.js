@@ -63,6 +63,26 @@ function setPollingInterval(seconds) {
 // EVENT LISTENERS INITIALIZATION
 // ==========================================
 function initEventListeners() {
+  // Close Modals/Drawers on Backdrop Click
+  const overlays = [
+    { el: el.mobileRoomsOverlay, fn: closeMobileRoomsSheet },
+    { el: el.mobileMoreOverlay, fn: closeMobileMoreSheet },
+    { el: el.cmdPaletteOverlay, fn: closeCommandPalette },
+    { el: el.agentDrawerOverlay, fn: closeAgentDrawer },
+    { el: el.cryptoStudioOverlay, fn: closeCryptoStudio },
+    { el: el.modalOverlay, fn: closeModal }
+  ];
+
+  overlays.forEach(item => {
+    if (item.el) {
+      item.el.addEventListener('click', (e) => {
+        if (e.target === item.el) {
+          if (item.fn) item.fn();
+        }
+      });
+    }
+  });
+
   // Scroll to Top FAB Logic
   const scrollTopBtn = document.getElementById('scroll-to-top-btn');
   if (scrollTopBtn) {
