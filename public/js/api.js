@@ -813,6 +813,17 @@ export function updateRoomStats() {
   }
   
   // Update Health Metric Card
+  const healthModalTrigger = document.getElementById("health-modal-trigger");
+  if (healthModalTrigger) {
+    if (metrics.sampleSize >= 10) {
+      healthModalTrigger.classList.remove('hidden');
+      healthModalTrigger.classList.add('flex');
+    } else {
+      healthModalTrigger.classList.add('hidden');
+      healthModalTrigger.classList.remove('flex');
+    }
+  }
+
   if (el.statHealth) {
     el.statHealth.className = `text-xl sm:text-2xl font-bold font-mono mt-1 z-10 transition-colors ${colorClass}`;
     el.statHealth.textContent = metrics.sampleSize < 10 ? '--' : `${metrics.healthScore}%`;

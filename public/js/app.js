@@ -360,7 +360,7 @@ function initEventListeners() {
 // ==========================================
 export async function initApp() {
   initElements();
-  const healthBtn = document.getElementById("health-pill-trigger");
+  const healthBtn = document.getElementById("health-modal-trigger");
   if (healthBtn) healthBtn.addEventListener("click", openHealthModal);
   initTheme();
   initEventListeners();
