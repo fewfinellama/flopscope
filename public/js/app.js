@@ -5,9 +5,9 @@
 
 import { state, el, initElements } from './store.js';
 import { showToast } from './toast.js';
+import { openHealthModal } from './health-modal.js';
 import { initTheme, toggleTheme } from './theme.js';
 import { 
-import { openHealthModal } from "./health-modal.js";
   getRoomFromUrl, 
   switchRoom, 
   loadRoomMessages, 
