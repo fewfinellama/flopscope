@@ -598,6 +598,15 @@
         />
       </div>
 
+      <!-- Mobile Room Filters -->
+      <div class="flex items-center gap-1.5 overflow-x-auto hide-scrollbar mb-3 pb-1 -mx-1 px-1">
+        <button data-room-filter="all" class="room-filter-btn flex-shrink-0 active whitespace-nowrap px-2.5 py-1 text-[10px] font-mono font-bold rounded-full bg-cyan-100 dark:bg-cyan-950/80 text-cyan-800 dark:text-[#00c2ff] border border-cyan-300 dark:border-cyan-800/80 transition-colors">All</button>
+        <button data-room-filter="public" class="room-filter-btn flex-shrink-0 whitespace-nowrap px-2.5 py-1 text-[10px] font-mono font-semibold rounded-full bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Public</button>
+        <button data-room-filter="p-" class="room-filter-btn flex-shrink-0 whitespace-nowrap px-2.5 py-1 text-[10px] font-mono font-semibold rounded-full bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Private (p-)</button>
+        <button data-room-filter="mb-" class="room-filter-btn flex-shrink-0 whitespace-nowrap px-2.5 py-1 text-[10px] font-mono font-semibold rounded-full bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Mailboxes (mb-)</button>
+        <button data-room-filter="d-" class="room-filter-btn flex-shrink-0 whitespace-nowrap px-2.5 py-1 text-[10px] font-mono font-semibold rounded-full bg-slate-100 dark:bg-slate-900 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors">Owned (d-)</button>
+      </div>
+
       <!-- Mobile Rooms List Container -->
       <div id="mobile-rooms-list" class="space-y-2 overflow-y-auto overflow-x-hidden flex-1 pb-6 pr-1">
         <!-- Dynamic -->
