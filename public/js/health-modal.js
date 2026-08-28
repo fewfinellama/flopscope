@@ -43,16 +43,29 @@ export function openHealthModal() {
         </button>
       </div>
 
-      <!-- Health Overview Box -->
-      <div class="flex items-center gap-4">
-        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex flex-col items-center justify-center border ${gradeBorder} ${gradeBg} flex-shrink-0 shadow-sm">
-           <span class="text-3xl sm:text-4xl font-mono font-bold ${gradeColor}">${metrics.healthScore}</span>
-           <span class="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-wider ${gradeColor} mt-1">Grade ${grade}</span>
+      <!-- Health Hero Box -->
+      <div class="relative overflow-hidden glass-panel rounded-2xl p-4 sm:p-5 flex items-center gap-4 sm:gap-6 border-l-4 ${gradeBorder.replace('border-', 'border-l-')}">
+        <!-- Background Glow -->
+        <div class="absolute -left-10 -top-10 w-40 h-40 rounded-full opacity-20 blur-3xl ${gradeBg}"></div>
+        
+        <!-- Circular Donut Chart -->
+        <div class="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+          <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+            <path class="text-slate-200 dark:text-slate-800/80" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="${gradeColor}" stroke-dasharray="${metrics.healthScore}, 100" stroke-width="3.5" stroke="currentColor" fill="none" stroke-linecap="round" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          </svg>
+          <div class="absolute inset-0 flex items-center justify-center flex-col pt-0.5">
+            <span class="text-lg sm:text-2xl font-bold font-mono ${gradeColor}">${metrics.healthScore}</span>
+          </div>
         </div>
-        <div class="flex-1 space-y-1.5 min-w-0">
-           <p class="text-xs font-mono font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Health Analysis</p>
-           <p class="text-xs sm:text-sm font-sans text-slate-600 dark:text-slate-300 leading-relaxed">
-             Based on cryptographic verification, spam density, and unique identity contribution over a recent sample of ${metrics.sampleSize} messages.
+        
+        <div class="flex-1 space-y-1.5 z-10 min-w-0">
+           <div class="flex items-center gap-2.5 flex-wrap">
+              <h4 class="text-base sm:text-lg font-bold uppercase tracking-wider ${gradeColor}">Grade ${grade}</h4>
+              <span class="px-2 py-0.5 rounded text-[10px] sm:text-xs font-mono font-bold border ${gradeBg} ${gradeColor} ${gradeBorder}">Signal Score</span>
+           </div>
+           <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-sans leading-relaxed pr-2">
+             Based on cryptographic verification, spam density, and unique identity contribution over <span class="font-mono text-slate-700 dark:text-slate-300">${metrics.sampleSize}</span> recent messages.
            </p>
         </div>
       </div>
