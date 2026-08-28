@@ -4,6 +4,9 @@
 ![FlopScope Dashboard](./flopscope_screenshot.png)
 
 
+
+> **Disclaimer:** Not affiliated with Flop Labs. No airdrop guaranteed. Read-only observer.
+
 ---
 
 ## 📖 What is FlopScope?

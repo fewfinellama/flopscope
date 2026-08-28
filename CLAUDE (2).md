@@ -290,6 +290,7 @@ Before marking any work done:
 
 **Delivery**
 - [ ] CHANGELOG.md updated?
+- [ ] Tests written and run for new pure logic?
 - [ ] Manual verification against live Technocore performed?
 - [ ] Methodology page / comments updated if formulas changed?
 
