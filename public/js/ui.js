@@ -640,7 +640,7 @@ export function openRawJsonModal() {
 const COMMANDS = [
   { id: 'jump-lobby', title: 'Jump to /r/lobby', badge: 'room', action: () => switchRoom('lobby') },
   { id: 'compare-rooms', title: 'Compare Rooms (A/B Test)', badge: 'tool', action: () => openCompareModal() },
-  { id: 'methodology', title: 'View Scoring Methodology', badge: 'docs', action: () => window.location.href = '/faq' },
+  { id: 'methodology', title: 'View Scoring Methodology', badge: 'docs', action: () => window.location.href = '/faq.html' },
   { id: 'open-studio', title: 'Open Crypto Studio & DID Verifier', badge: 'tool', action: openCryptoStudio },
   { id: 'toggle-density', title: 'Toggle Compact Density Mode', badge: 'ui', action: toggleDensity },
   { id: 'toggle-theme', title: 'Toggle Light / Dark Mode', badge: 'ui', action: toggleTheme },
