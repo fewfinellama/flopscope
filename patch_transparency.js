@@ -1,91 +1,120 @@
 import fs from 'fs';
-const code = `
-export function openHealthTransparencyModal() {
+let api = fs.readFileSync('public/js/api.js', 'utf8');
+
+// We need to replace the body of openHealthTransparencyModal.
+const startStr = "export function openHealthTransparencyModal() {";
+const startIndex = api.indexOf(startStr);
+if (startIndex === -1) process.exit(1);
+
+// Find the end of the function.
+let braceCount = 0;
+let endIndex = -1;
+for (let i = startIndex + startStr.length - 1; i < api.length; i++) {
+  if (api[i] === '{') braceCount++;
+  if (api[i] === '}') {
+    braceCount--;
+    if (braceCount === 0) {
+      endIndex = i;
+      break;
+    }
+  }
+}
+
+const replacement = `export function openHealthTransparencyModal() {
   const metrics = state.roomMetrics[state.currentRoom];
   if (!metrics) return;
 
-  const titleColor = metrics.healthScore >= 80 ? 'text-emerald-600 dark:text-emerald-400' 
-    : metrics.healthScore >= 50 ? 'text-amber-600 dark:text-amber-400' 
-    : 'text-rose-600 dark:text-rose-400';
+  const overallStatus = metrics.sampleSize < 10 ? 'ANALYZING' : (metrics.healthScore >= 80 ? 'EXCELLENT' : (metrics.healthScore >= 50 ? 'MODERATE' : 'POOR'));
+  
+  const overallColor = overallStatus === 'EXCELLENT'
+    ? 'text-emerald-600 dark:text-emerald-400'
+    : overallStatus === 'MODERATE'
+    ? 'text-amber-600 dark:text-amber-400'
+    : overallStatus === 'POOR'
+    ? 'text-rose-600 dark:text-rose-400'
+    : 'text-slate-500';
+
+  const lastRunText = metrics.lastComputed
+    ? \`Computed \${Math.round((Date.now() - metrics.lastComputed) / 1000)}s ago\`
+    : 'Not yet run';
+
+  const formatRow = (name, statusText, statusType, detail) => {
+    const icon = statusType === 'pass'
+      ? \`<svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>\`
+      : statusType === 'fail'
+      ? \`<svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>\`
+      : \`<svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01"/></svg>\`;
+
+    const statusColor = statusType === 'pass'
+      ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
+      : statusType === 'fail'
+      ? 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50'
+      : 'text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800';
+
+    const pillClass = statusType === 'pass' 
+      ? 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-400' 
+      : statusType === 'fail' 
+      ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-400' 
+      : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400';
+
+    return \`
+      <div class="p-3 rounded-xl border \${statusColor} space-y-1">
+        <div class="flex items-center gap-2">
+          \${icon}
+          <span class="font-mono font-bold text-xs tracking-wide uppercase">\${name}</span>
+          <span class="ml-auto text-xs font-bold font-mono px-2 py-0.5 rounded-full \${pillClass}">\${statusText}</span>
+        </div>
+        <p class="text-xs leading-relaxed pl-6 text-slate-600 dark:text-slate-400 font-sans">\${detail}</p>
+      </div>\`;
+  };
+
+  const rows = [
+    formatRow('Spam Penalty', \`-\${metrics.breakdown.spamPenalty || 0} / 35\`, metrics.breakdown.spamPenalty > 15 ? 'fail' : 'pass', \`\${Math.round(metrics.spamShare*100)}% of messages matched known farming patterns.\`),
+    formatRow('Signal Bonus', \`+\${metrics.breakdown.signalBonus || 0} / 25\`, metrics.breakdown.signalBonus >= 10 ? 'pass' : 'fail', \`\${Math.round(metrics.signalShare*100)}% of messages had meaningful length or external links.\`),
+    formatRow('Concentration', \`-\${metrics.breakdown.concentrationPenalty || 0} / 20\`, metrics.breakdown.concentrationPenalty > 10 ? 'fail' : 'pass', \`HHI is \${metrics.authorConcentration.toFixed(2)}. Higher means fewer DIDs dominate the room.\`),
+    formatRow('Reciprocity', \`+\${metrics.breakdown.reciprocityBonus || 0} / 15\`, metrics.breakdown.reciprocityBonus > 0 ? 'pass' : 'fail', \`\${Math.round(metrics.reciprocity*100)}% of messages were replied to by others.\`),
+    formatRow('Persistence', \`+\${metrics.breakdown.persistenceBonus || 0} / 5\`, metrics.breakdown.persistenceBonus > 0 ? 'pass' : 'fail', \`\${metrics.uniquePersistentDids} DIDs sent multiple messages in this window.\`)
+  ].join('');
 
   el.modalContainer.innerHTML = \`
-    <div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
-      <h3 class="text-base font-bold font-mono text-slate-800 dark:text-slate-100 flex items-center gap-2">
-        <svg class="w-5 h-5 \${titleColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        Room Health Scoring (v1)
-      </h3>
-      <button id="modal-close-btn" class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors p-1 rounded-lg">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-    </div>
-    
-    <div class="p-4 sm:p-5 overflow-y-auto max-h-[80vh] space-y-6">
-      
-      <div class="bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 p-4 text-center">
-        <div class="text-sm font-mono text-slate-500 dark:text-slate-400 mb-1">Current Health Score</div>
-        <div class="text-5xl font-bold font-mono \${titleColor}">\${metrics.sampleSize < 10 ? '--' : metrics.healthScore}</div>
-        <div class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-2">Based on the last \${metrics.sampleSize} messages</div>
+    <div class="p-5 sm:p-6 space-y-5 text-slate-800 dark:text-slate-200">
+
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 \${overallColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">Room Health Diagnostic</h3>
+        </div>
+        <button id="modal-close-btn" class="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 transition-colors rounded-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
-      
-      <div class="space-y-3">
-        <h4 class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Formula Breakdown</h4>
-        <div class="bg-slate-100/50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-200 dark:divide-slate-800 text-sm font-mono">
-          
-          <div class="flex items-center justify-between p-3">
-            <div class="text-slate-700 dark:text-slate-300">
-              <span class="font-bold">Spam Penalty</span> (Max 35)
-              <div class="text-[10px] text-slate-500 font-sans mt-0.5">\${Math.round(metrics.spamShare*100)}% of messages matched farming patterns</div>
-            </div>
-            <div class="font-bold text-rose-500 dark:text-rose-400">-\${metrics.breakdown.spamPenalty || 0}</div>
-          </div>
-          
-          <div class="flex items-center justify-between p-3">
-            <div class="text-slate-700 dark:text-slate-300">
-              <span class="font-bold">Signal Bonus</span> (Max 25)
-              <div class="text-[10px] text-slate-500 font-sans mt-0.5">\${Math.round(metrics.signalShare*100)}% had meaningful length or links</div>
-            </div>
-            <div class="font-bold text-emerald-500 dark:text-emerald-400">+\${metrics.breakdown.signalBonus || 0}</div>
-          </div>
-          
-          <div class="flex items-center justify-between p-3">
-            <div class="text-slate-700 dark:text-slate-300">
-              <span class="font-bold">Concentration Penalty</span> (Max 20)
-              <div class="text-[10px] text-slate-500 font-sans mt-0.5">Herfindahl Index: \${metrics.authorConcentration.toFixed(2)} (1.0 = single author)</div>
-            </div>
-            <div class="font-bold text-amber-500 dark:text-amber-400">-\${metrics.breakdown.concentrationPenalty || 0}</div>
-          </div>
-          
-          <div class="flex items-center justify-between p-3">
-            <div class="text-slate-700 dark:text-slate-300">
-              <span class="font-bold">Reciprocity Bonus</span> (Max 15)
-              <div class="text-[10px] text-slate-500 font-sans mt-0.5">\${Math.round(metrics.reciprocity*100)}% of messages were replied to</div>
-            </div>
-            <div class="font-bold text-emerald-500 dark:text-emerald-400">+\${metrics.breakdown.reciprocityBonus || 0}</div>
-          </div>
-          
-          <div class="flex items-center justify-between p-3">
-            <div class="text-slate-700 dark:text-slate-300">
-              <span class="font-bold">Persistence Bonus</span> (Max 5)
-              <div class="text-[10px] text-slate-500 font-sans mt-0.5">\${metrics.uniquePersistentDids} DIDs with >= 2 messages</div>
-            </div>
-            <div class="font-bold text-emerald-500 dark:text-emerald-400">+\${metrics.breakdown.persistenceBonus || 0}</div>
-          </div>
-          
+
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">\${lastRunText} (Sample size: \${metrics.sampleSize})</p>
+          <p class="text-lg font-bold font-mono \${overallColor} mt-0.5">Score: \${metrics.healthScore}% · \${overallStatus}</p>
         </div>
       </div>
-      
-      <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans text-center">
-        The Health Score is a read-only diagnostic signal, not a moral judgment.
+
+      <div class="space-y-2.5">
+        <h4 class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Formula Breakdown</h4>
+        \${rows}
+      </div>
+
+      <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans text-center pt-2">
+        The Health Score is a read-only, client-side diagnostic signal, not a moral judgment.
       </p>
     </div>
   \`;
 
   el.modalOverlay.classList.remove('hidden');
   el.modalOverlay.classList.add('flex');
+
   const closeBtn = document.getElementById('modal-close-btn');
   if (closeBtn) closeBtn.onclick = () => { import('./ui.js').then(m => m.closeModal()); };
-}
-`;
-let api = fs.readFileSync('public/js/api.js', 'utf8');
-api = api + '\n' + code;
+}`;
+
+api = api.substring(0, startIndex) + replacement + api.substring(endIndex + 1);
 fs.writeFileSync('public/js/api.js', api);
