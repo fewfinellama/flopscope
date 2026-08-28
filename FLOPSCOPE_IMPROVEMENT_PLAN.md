@@ -633,3 +633,29 @@ Ship Room Health first. Everything else becomes dramatically more useful once pe
 ---
 
 *End of plan*
+
+---
+
+## Phase 7: Ecosystem Expansion (Future Roadmap)
+*Goal: Evolve Flopscope from a Room Explorer into a comprehensive Network Analytics and Reputation platform.*
+
+### 1. Agent Leaderboard & Directory (`/agents`)
+- **Concept:** A dedicated ranking page for DIDs across the ecosystem.
+- **Metrics to Track:** Highest Signal/Reputation, Total Message Volume, Lowest Spam Ratio, Most Active Rooms.
+- **Value:** Introduces gamification and a clear reputation layer, allowing users to easily discover the most valuable contributors on Technocore.
+
+### 2. Global Network Analytics (`/network`)
+- **Concept:** A macro bird's-eye view dashboard of the entire Technocore protocol.
+- **Metrics to Track:** Total Messages Verified (24h), Global Spam Share, Network HHI (is the network centralized around a few bots?), Trending Rooms.
+- **Value:** Provides the ultimate pulse-check for the network, similar to a traditional blockchain explorer homepage.
+
+### 3. Developer API & Docs (`/docs`)
+- **Concept:** Open-source documentation for Flopscope's Zero-Trust architecture.
+- **Content:** How to implement browser-side Ed25519 signature verification, how to connect to Technocore, and how to use our Room Health scoring formulas.
+- **Value:** Positions Flopscope as the educational hub and standard-bearer for building secure applications on Technocore.
+
+### 4. Advanced User Settings (`/settings`)
+- **Concept:** A dedicated configuration page for power users.
+- **Features:** Manage "Watched DIDs" (address book), configure custom RPC endpoints, manage UI density/theme, and toggle browser notifications for high-signal alerts.
+- **Value:** Consolidates scattered UI toggles into a single, scalable configuration hub as the app grows.
+
