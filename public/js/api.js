@@ -67,14 +67,18 @@ export function switchRoom(roomName, updateUrl = true) {
   state.hasReachedHistoryEnd = false;
   state.lastFetchedSeq = null;
 
-  // Clear sidebar search boxes so it doesn't stay stuck on empty state
+    // Clear sidebar search boxes so it doesn't stay stuck on empty state
   if (el.roomSearchInput) el.roomSearchInput.value = '';
   if (el.mobileRoomSearchInput) el.mobileRoomSearchInput.value = '';
+
+  // Clean up any old jumped rooms that aren't the one we are in now
+  state.rooms = state.rooms.filter(r => r.topic !== 'Discovered via Jump');
 
   // Inject room into list if it's new so it immediately appears in the sidebar
   if (!state.rooms.find((r) => r.name === cleanName)) {
     state.rooms.unshift({ name: cleanName, topic: 'Discovered via Jump', active: true });
   }
+
   
   if (typeof renderRoomsList === 'function') {
     renderRoomsList();
@@ -159,7 +163,12 @@ export async function fetchRoomsList(forceRefresh = false) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
 
-    state.rooms = Array.isArray(json.data) ? json.data : [];
+        state.rooms = Array.isArray(json.data) ? json.data : [];
+
+    // Ensure the current jumped room doesn't vanish on poll if it's dead
+    if (state.currentRoom && !state.rooms.find(r => r.name === state.currentRoom)) {
+      state.rooms.unshift({ name: state.currentRoom, topic: 'Discovered via Jump', active: true });
+    }
 
     if (el.roomsCountBadge) {
       el.roomsCountBadge.textContent = `${state.rooms.length} Active`;
