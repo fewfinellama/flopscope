@@ -6,7 +6,7 @@
 import { state, el, initElements } from './store.js';
 import { showToast } from './toast.js';
 import { openHealthModal } from './health-modal.js';
-import { initTheme, toggleTheme } from './theme.js';
+import { initTheme, toggleTheme, initDensity, toggleDensity } from './theme.js';
 import { 
   getRoomFromUrl, 
   switchRoom, 
@@ -104,6 +104,8 @@ function initEventListeners() {
   // Theme Toggles
   if (el.themeToggleBtn) el.themeToggleBtn.onclick = toggleTheme;
   if (el.mobileThemeToggleBtn) el.mobileThemeToggleBtn.onclick = toggleTheme;
+  if (el.densityToggleBtn) el.densityToggleBtn.onclick = toggleDensity;
+  if (el.mobileDensityToggleBtn) el.mobileDensityToggleBtn.onclick = toggleDensity;
 
   // Refresh Buttons
   if (el.refreshBtn) el.refreshBtn.onclick = () => loadRoomMessages(state.currentRoom, true);
@@ -363,6 +365,7 @@ export async function initApp() {
   const healthBtn = document.getElementById("health-modal-trigger");
   if (healthBtn) healthBtn.addEventListener("click", openHealthModal);
   initTheme();
+  initDensity();
   initEventListeners();
 
   // Read initial room from URL
@@ -400,3 +403,10 @@ if (document.readyState === 'loading') {
 } else {
   initApp();
 }
+
+window.addEventListener('density-changed', () => {
+  import('./api.js').then(api => {
+    api.renderRoomsList();
+    api.renderMessagesFeed();
+  });
+});

@@ -325,11 +325,11 @@ export function createRoomButtonHtml(r, isMobile = false) {
     <div class="group relative block w-full">
       <button
         data-room="${escapeHtml(r.name)}"
-        class="room-nav-btn w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700/80 text-left transition-all duration-150 flex flex-col gap-1.5 ${activeClass}"
+        class="room-nav-btn w-full ${state.density === 'compact' ? 'p-2 gap-1' : 'p-3 gap-1.5'} rounded-xl border border-slate-200 dark:border-slate-700/80 text-left transition-all duration-150 flex flex-col ${activeClass}"
       >
         <div class="flex items-start justify-between gap-2 w-full">
-          <div class="flex flex-col gap-1 min-w-0">
-            <span class="font-mono text-sm tracking-tight truncate flex items-center gap-1.5">
+          <div class="flex flex-col ${state.density === 'compact' ? 'gap-0.5' : 'gap-1'} min-w-0">
+            <span class="font-mono ${state.density === 'compact' ? 'text-xs' : 'text-sm'} tracking-tight truncate flex items-center gap-1.5">
               <span class="${isActive ? 'text-cyan-500 dark:text-[#00c2ff]' : 'text-slate-400 dark:text-slate-500'} font-bold">/r/</span>${escapeHtml(r.name)}
             </span>
             <span class="text-[11px] font-mono text-slate-400 dark:text-slate-500 flex-shrink-0">
@@ -349,7 +349,7 @@ export function createRoomButtonHtml(r, isMobile = false) {
           </div>
         </div>
         ${
-          r.topic
+          r.topic && state.density !== 'compact'
             ? `<p class="text-xs text-slate-500 dark:text-slate-400 truncate w-full mt-0.5">${escapeHtml(r.topic)}</p>`
             : ''
         }
@@ -1043,9 +1043,9 @@ export function createMessageCardHtml(msg) {
 
   // Identicon Avatar HTML
   const avatarHtml = isSigned
-    ? generateIdenticonSvg(msg.from, 36)
+    ? generateIdenticonSvg(msg.from, state.density === 'compact' ? 28 : 36)
     : `
-      <div class="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-mono font-bold text-slate-600 dark:text-slate-300 text-xs shadow-sm flex-shrink-0">
+      <div class="${state.density === 'compact' ? 'w-7 h-7 text-[10px]' : 'w-9 h-9 text-xs'} rounded-xl bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-mono font-bold text-slate-600 dark:text-slate-300 shadow-sm flex-shrink-0">
         ${escapeHtml((msg.from || 'U').charAt(0).toUpperCase())}
       </div>
     `;
@@ -1061,7 +1061,7 @@ export function createMessageCardHtml(msg) {
   const formattedBody = formatMessageBody(msg.rawText || msg.text || '');
 
   return `
-    <div id="msg-${msg.seq}" class="message-card glass-panel rounded-2xl p-4 sm:p-5 flex flex-col gap-3">
+    <div id="msg-${msg.seq}" class="message-card glass-panel rounded-2xl ${state.density === 'compact' ? 'p-3 sm:p-4 gap-2' : 'p-4 sm:p-5 gap-3'} flex flex-col">
       
       <!-- Top Message Header Bar -->
       <div class="flex items-start justify-between gap-3 flex-wrap">
@@ -1098,7 +1098,7 @@ export function createMessageCardHtml(msg) {
 
       <!-- Message Content Body -->
       <div class="relative group">
-        <div id="msg-body-${msg.seq}" class="text-slate-800 dark:text-slate-200 text-sm sm:text-base leading-relaxed break-words font-sans selection:bg-cyan-500/30 line-clamp-3 transition-all duration-300">
+        <div id="msg-body-${msg.seq}" class="text-slate-800 dark:text-slate-200 ${state.density === 'compact' ? 'text-xs sm:text-sm' : 'text-sm sm:text-base'} leading-relaxed break-words font-sans selection:bg-cyan-500/30 line-clamp-3 transition-all duration-300">
           ${formattedBody}
         </div>
         <button data-action="toggle-expand" data-seq="${msg.seq}" class="hidden mt-2 text-xs font-mono font-bold text-cyan-700 dark:text-[#00c2ff] hover:underline items-center gap-1">
