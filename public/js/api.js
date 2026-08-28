@@ -1,7 +1,9 @@
+import { analyzeDids } from './did-analyzer.js';
 import { computeRoomHealth } from './health-scorer.js';
 import { state, el } from './store.js';
 import { showToast } from './toast.js';
-import { openAgentDrawer, openProofInspector } from './ui.js';
+import { openAgentDrawer, openProofInspector, closeAgentDrawer } from './ui.js';
+import { applyUsefulnessFilter } from './filters.js';
 import { closeMobileRoomsSheet, closeMobileMoreSheet, closeCommandPalette } from './ui.js';
 
 import {
@@ -60,9 +62,28 @@ export function switchRoom(roomName, updateUrl = true) {
   }
 
   state.currentRoom = cleanName;
+  state.messages = []; // CRITICAL: Clear old room's messages!
+  state.verificationCache.clear(); // Clear cryptographic verification cache for the new room
   state.unseenNewMessagesCount = 0;
   state.hasReachedHistoryEnd = false;
   state.lastFetchedSeq = null;
+
+    // Clear sidebar search boxes so it doesn't stay stuck on empty state
+  if (el.roomSearchInput) el.roomSearchInput.value = '';
+  if (el.mobileRoomSearchInput) el.mobileRoomSearchInput.value = '';
+
+  // Clean up any old jumped rooms that aren't the one we are in now
+  state.rooms = state.rooms.filter(r => r.topic !== 'Discovered via Jump');
+
+  // Inject room into list if it's new so it immediately appears in the sidebar
+  if (!state.rooms.find((r) => r.name === cleanName)) {
+    state.rooms.unshift({ name: cleanName, topic: 'Discovered via Jump', active: true });
+  }
+
+  
+  if (typeof renderRoomsList === 'function') {
+    renderRoomsList();
+  }
 
   if (updateUrl) {
     try {
@@ -143,7 +164,12 @@ export async function fetchRoomsList(forceRefresh = false) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
 
-    state.rooms = Array.isArray(json.data) ? json.data : [];
+        state.rooms = Array.isArray(json.data) ? json.data : [];
+
+    // Ensure the current jumped room doesn't vanish on poll if it's dead
+    if (state.currentRoom && !state.rooms.find(r => r.name === state.currentRoom)) {
+      state.rooms.unshift({ name: state.currentRoom, topic: 'Discovered via Jump', active: true });
+    }
 
     if (el.roomsCountBadge) {
       el.roomsCountBadge.textContent = `${state.rooms.length} Active`;
@@ -182,11 +208,24 @@ export function renderRoomsList() {
     });
 
     if (filtered.length === 0) {
-      el.roomsList.innerHTML = `
-        <div class="text-center py-6 text-slate-500 text-xs font-mono">
-          No rooms matching "${escapeHtml(desktopSearch)}" in this category
-        </div>
-      `;
+      if (desktopSearch.length > 0) {
+        const targetRoom = escapeHtml(desktopSearch).replace(/[^a-z0-9-]/gi, '');
+        el.roomsList.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs font-mono space-y-3">
+            <p>No active rooms matching "${escapeHtml(desktopSearch)}"</p>
+            <button data-room="${targetRoom}" class="room-nav-btn btn-interactive px-4 py-2 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800 rounded-xl font-bold font-mono inline-flex items-center gap-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Jump to /r/${targetRoom}
+            </button>
+          </div>
+        `;
+      } else {
+        el.roomsList.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs font-mono">
+            No rooms matching in this category
+          </div>
+        `;
+      }
     } else {
       el.roomsList.innerHTML = filtered.map((r) => createRoomButtonHtml(r)).join('');
     }
@@ -200,11 +239,24 @@ export function renderRoomsList() {
     });
 
     if (filtered.length === 0) {
-      el.mobileRoomsList.innerHTML = `
-        <div class="text-center py-6 text-slate-500 text-xs font-mono">
-          No rooms matching "${escapeHtml(mobileSearch)}" in this category
-        </div>
-      `;
+      if (mobileSearch.length > 0) {
+        const targetRoom = escapeHtml(mobileSearch).replace(/[^a-z0-9-]/gi, '');
+        el.mobileRoomsList.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs font-mono space-y-3">
+            <p>No active rooms matching "${escapeHtml(mobileSearch)}"</p>
+            <button data-room="${targetRoom}" class="room-nav-btn btn-interactive px-4 py-2 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800 rounded-xl font-bold font-mono inline-flex items-center gap-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Jump to /r/${targetRoom}
+            </button>
+          </div>
+        `;
+      } else {
+        el.mobileRoomsList.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs font-mono">
+            No rooms matching in this category
+          </div>
+        `;
+      }
     } else {
       el.mobileRoomsList.innerHTML = filtered.map((r) => createRoomButtonHtml(r, true)).join('');
     }
@@ -350,14 +402,41 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
     console.error('Failed to load room messages:', err);
     if (isInitial && el.messagesContainer) {
       el.messagesContainer.innerHTML = `
-        <div class="text-center py-12 px-4 rounded-2xl glass-panel border border-red-500/30 text-red-400 font-mono text-sm space-y-2">
-          <p class="font-bold">Failed to load /r/${escapeHtml(roomName)}</p>
-          <p class="text-xs text-slate-400">${escapeHtml(err.message)}</p>
-          <button onclick="window.flopscope.loadRoomMessages('${escapeHtml(roomName)}', true, true)" class="mt-3 px-4 py-2 bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 rounded-xl text-xs">
-            Retry Connection
+        <div class="text-center py-16 px-4 rounded-2xl glass-panel border border-rose-500/20 dark:border-rose-500/10 bg-rose-50/50 dark:bg-rose-950/10 flex flex-col items-center justify-center space-y-4 overflow-hidden">
+          <div class="p-4 bg-rose-100 dark:bg-rose-900/30 rounded-full text-rose-500 dark:text-rose-400 mb-2">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <div class="space-y-1">
+            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200 tracking-tight">Connection Failed</h3>
+            <p class="text-sm font-mono text-rose-600 dark:text-rose-400">Failed to load /r/${escapeHtml(roomName)}</p>
+            <p class="text-xs font-mono text-slate-500 dark:text-slate-500 bg-white/50 dark:bg-black/20 py-1 px-3 rounded-lg inline-block mt-2">${escapeHtml(err.message)}</p>
+          </div>
+          <button id="error-retry-btn" class="mt-4 px-5 py-2.5 bg-[#00c2ff] hover:bg-[#009bcf] text-white rounded-xl text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 w-40">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Retry
           </button>
         </div>
       `;
+      const retryBtn = document.getElementById('error-retry-btn');
+      if (retryBtn) {
+        retryBtn.onclick = () => {
+          retryBtn.innerHTML = '<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Retrying...';
+          retryBtn.disabled = true;
+          retryBtn.classList.add('opacity-75', 'cursor-not-allowed');
+          
+          // Small delay before fetching so the user actually sees the button state change
+          setTimeout(() => {
+            loadRoomMessages(roomName, true, false).then(() => {
+              // Now we manually fetch rooms too because the sidebar might be empty!
+              if (state.rooms.length === 0) {
+                fetchRoomsList(true);
+              }
+            });
+          }, 300);
+        };
+      }
     }
   } finally {
     state.isLoading = false;
@@ -412,7 +491,7 @@ export async function loadOlderHistory() {
   const oldestSeq = Math.min(...state.messages.map((m) => m.seq || 0));
 
   try {
-    const url = `/api/rooms/${encodeURIComponent(state.currentRoom)}/history?before=${oldestSeq}&limit=50`;
+    const url = `/api/rooms/${encodeURIComponent(state.currentRoom)}/history?before=${oldestSeq}&limit=200`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
@@ -451,6 +530,7 @@ export function updateRoomStats() {
   const verifiedCount = Array.from(state.verificationCache.values()).filter((v) => v.valid).length;
   const velocity = calculateChatVelocity(state.messages);
   const metrics = computeRoomHealth(state.currentRoom, state.messages);
+  analyzeDids(state.currentRoom, state.messages);
   state.roomMetrics[state.currentRoom] = metrics;
   const healthPill = document.getElementById("health-pill-trigger");
   const healthText = document.getElementById("health-pill-text");
@@ -561,7 +641,9 @@ export function renderMessagesFeed() {
     // 1. Text & DID Search
     if (query) {
       const matchText = (m.rawText || m.text || '').toLowerCase().includes(query);
-      const matchFrom = (m.from || '').toLowerCase().includes(query);
+      const fullFrom = (m.from || '').toLowerCase();
+      const truncFrom = (m.from && m.from.startsWith('did:key:')) ? truncateDid(m.from).toLowerCase() : fullFrom;
+      const matchFrom = fullFrom.includes(query) || truncFrom.includes(query);
       const matchSeq = String(m.seq).includes(query);
       const matchNonce = m.nonce ? String(m.nonce).toLowerCase().includes(query) : false;
       if (!matchText && !matchFrom && !matchSeq && !matchNonce) return false;
@@ -577,6 +659,9 @@ export function renderMessagesFeed() {
 
     return true;
   });
+
+  // 3. Usefulness filter (pure pass — URL / code / high-signal / protocol)
+  filtered = applyUsefulnessFilter(filtered, state.usefulnessFilter);
 
   // Sort messages
   filtered.sort((a, b) => {
@@ -818,4 +903,37 @@ export function attachCardEventListeners() {
       }
     });
   }, 50);
+}
+export function jumpToMessage(room, seq) {
+  closeAgentDrawer();
+
+  if (state.currentRoom !== room) {
+    showToast(`Jumping to /r/${room}...`);
+    switchRoom(room);
+    // Poll every 100ms until the message card is rendered
+    let attempts = 0;
+    const checkExist = setInterval(() => {
+      const targetEl = document.getElementById(`msg-${seq}`);
+      if (targetEl || attempts > 20) {
+        clearInterval(checkExist);
+        if (targetEl) {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          targetEl.classList.add('ring-2', 'ring-cyan-400');
+          setTimeout(() => targetEl.classList.remove('ring-2', 'ring-cyan-400'), 2000);
+        } else {
+          showToast(`Message #${seq} is too old to be in the recent feed.`);
+        }
+      }
+      attempts++;
+    }, 100);
+  } else {
+    const targetEl = document.getElementById(`msg-${seq}`);
+    if (targetEl) {
+      targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      targetEl.classList.add('ring-2', 'ring-cyan-400');
+      setTimeout(() => targetEl.classList.remove('ring-2', 'ring-cyan-400'), 2000);
+    } else {
+      showToast(`Message #${seq} is too old to be in the recent feed. Load more history first.`);
+    }
+  }
 }

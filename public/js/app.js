@@ -12,7 +12,8 @@ import {
   switchRoom, 
   loadRoomMessages, 
   fetchRoomsList, 
-  loadOlderHistory, 
+  loadOlderHistory,
+  jumpToMessage, 
   renderMessagesFeed, 
   renderRoomsList,
   updateRoomHeaderInfo
@@ -62,6 +63,42 @@ function setPollingInterval(seconds) {
 // EVENT LISTENERS INITIALIZATION
 // ==========================================
 function initEventListeners() {
+  // Close Modals/Drawers on Backdrop Click
+  const overlays = [
+    { el: el.mobileRoomsOverlay, fn: closeMobileRoomsSheet },
+    { el: el.mobileMoreOverlay, fn: closeMobileMoreSheet },
+    { el: el.cmdPaletteOverlay, fn: closeCommandPalette },
+    { el: el.agentDrawerOverlay, fn: closeAgentDrawer },
+    { el: el.cryptoStudioOverlay, fn: closeCryptoStudio },
+    { el: el.modalOverlay, fn: closeModal }
+  ];
+
+  overlays.forEach(item => {
+    if (item.el) {
+      item.el.addEventListener('click', (e) => {
+        if (e.target === item.el) {
+          if (item.fn) item.fn();
+        }
+      });
+    }
+  });
+
+  // Scroll to Top FAB Logic
+  const scrollTopBtn = document.getElementById('scroll-to-top-btn');
+  if (scrollTopBtn) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) {
+        scrollTopBtn.classList.remove('translate-y-16', 'opacity-0');
+      } else {
+        scrollTopBtn.classList.add('translate-y-16', 'opacity-0');
+      }
+    });
+    
+    scrollTopBtn.onclick = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  }
+
   // Theme Toggles
   if (el.themeToggleBtn) el.themeToggleBtn.onclick = toggleTheme;
   if (el.mobileThemeToggleBtn) el.mobileThemeToggleBtn.onclick = toggleTheme;
@@ -204,13 +241,41 @@ function initEventListeners() {
   if (el.searchInput) {
     el.searchInput.oninput = (e) => {
       state.searchQuery = e.target.value;
+      
+      // Toggle clear button visibility
+      if (el.clearSearchBtn) {
+        if (state.searchQuery.length > 0) {
+          el.clearSearchBtn.classList.remove('hidden');
+        } else {
+          el.clearSearchBtn.classList.add('hidden');
+        }
+      }
+      
       renderMessagesFeed();
+    };
+  }
+  
+  if (el.clearSearchBtn) {
+    el.clearSearchBtn.onclick = () => {
+      if (el.searchInput) {
+        el.searchInput.value = '';
+        state.searchQuery = '';
+        el.clearSearchBtn.classList.add('hidden');
+        renderMessagesFeed();
+      }
     };
   }
 
   if (el.filterSelect) {
     el.filterSelect.onchange = (e) => {
       state.filter = e.target.value;
+      renderMessagesFeed();
+    };
+  }
+
+  if (el.usefulnessFilterSelect) {
+    el.usefulnessFilterSelect.onchange = (e) => {
+      state.usefulnessFilter = e.target.value;
       renderMessagesFeed();
     };
   }
@@ -313,6 +378,7 @@ window.flopscope = {
   loadRoomMessages,
   fetchRoomsList,
   loadOlderHistory,
+  jumpToMessage,
   openCryptoStudio,
   openAgentDrawer,
   openProofInspector,

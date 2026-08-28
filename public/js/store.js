@@ -3,6 +3,7 @@ export const state = {
   messages: [],
   rooms: [],
   roomMetrics: {},
+  didStats: new Map(),
   pollingInterval: 10,
   pollingTimer: null,
   filter: 'all',
@@ -10,6 +11,7 @@ export const state = {
   searchQuery: '',
   roomTypeFilter: 'all',
   sortOrder: 'desc',
+  usefulnessFilter: 'all',
   verificationCache: new Map(),
   unseenNewMessagesCount: 0,
   hasReachedHistoryEnd: false,
@@ -66,7 +68,9 @@ export function initElements() {
 
   // Controls & Filter
   el.searchInput = document.getElementById('search-input');
+  el.clearSearchBtn = document.getElementById("clear-search-btn");
   el.filterSelect = document.getElementById('filter-select');
+  el.usefulnessFilterSelect = document.getElementById('usefulness-filter-select');
   el.sortBtn = document.getElementById('sort-btn');
   el.sortIcon = document.getElementById('sort-icon');
   el.sortLabel = document.getElementById('sort-label');

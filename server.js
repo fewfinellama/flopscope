@@ -70,12 +70,12 @@ app.use(express.json({ limit: '100kb' }));
 
 // 4. Rate Limiting for API routes (100 req / 15 min window)
 const apiLimiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 100,
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000, // 15 minutes
+  max: parseInt(process.env.RATE_LIMIT_MAX, 10) || 1000, // Increased to 1000 to support 10s auto-polling
   standardHeaders: true,
   legacyHeaders: false,
   message: {
-    error: 'Too many requests from this IP. Rate limit is 100 requests per 15 minutes.',
+    error: 'Too many requests from this IP. Rate limit is 1000 requests per 15 minutes.',
     statusCode: 429,
   },
 });

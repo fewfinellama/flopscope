@@ -1,4 +1,5 @@
 import { state, el } from './store.js';
+import { closeModal } from './ui.js';
 
 export function openHealthModal() {
   const metrics = state.roomMetrics[state.currentRoom];
@@ -119,6 +120,16 @@ export function openHealthModal() {
         </div>
       </div>
 
+      
+      <!-- Methodology -->
+      <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+        <h4 class="text-xs font-mono font-bold text-slate-500 mb-2 uppercase tracking-wider">Scoring Methodology</h4>
+        <div class="text-[11px] text-slate-500 dark:text-slate-400 space-y-2 font-sans leading-relaxed">
+          <p><strong>Room Health (v1):</strong> Base score (30) + Density (+25 max) + Verification (+25 max) - Noise Penalties (0-20). Requires at least 10 messages for a stable rating.</p>
+          <p><strong>DID Sybil Radar (v1):</strong> Analyzes behavior across 3 key vectors: <em>Longevity</em> (time since first seen), <em>Originality</em> (n-gram similarity vs known boilerplate), and <em>Reciprocity</em> (time between overlapping broadcast bursts). Flags are deterministic signals, not moral judgments.</p>
+        </div>
+      </div>
+
       <!-- Trust Footer -->
       <div class="text-center pt-2">
         <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans flex items-center justify-center gap-1.5">
@@ -135,10 +146,7 @@ export function openHealthModal() {
 
   const closeBtn = document.getElementById('modal-close-btn');
   if (closeBtn) {
-    closeBtn.onclick = () => {
-      el.modalOverlay.classList.add('hidden');
-      el.modalOverlay.classList.remove('flex');
-    };
+    closeBtn.onclick = () => { closeModal(); };
   }
 }
 

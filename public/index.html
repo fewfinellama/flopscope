@@ -362,18 +362,30 @@
             type="text"
             id="search-input"
             placeholder="Search keywords, DIDs, seq, protocols..."
-            class="w-full pl-10 pr-3 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-[#00c2ff] focus:ring-2 focus:ring-[#00c2ff]/20 transition"
+            class="w-full pl-10 pr-10 py-2.5 bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:border-[#00c2ff] focus:ring-2 focus:ring-[#00c2ff]/20 transition"
           />
+          <button id="clear-search-btn" class="absolute right-3 top-3 p-0.5 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hidden transition cursor-pointer" title="Clear Search">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
         </div>
 
         <!-- Filter Dropdown & Sort Toggle -->
-        <div class="flex items-center gap-2.5 justify-between sm:justify-start">
-          <!-- Filter Select -->
+        <div class="flex items-center gap-2.5 justify-between sm:justify-start flex-wrap">
+          <!-- Type Filter Select -->
           <select id="filter-select" class="flex-1 sm:flex-initial bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-mono text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[#00c2ff] cursor-pointer">
             <option value="all" class="bg-white dark:bg-slate-900">All Messages</option>
             <option value="signed" class="bg-white dark:bg-slate-900">Signed (did:key)</option>
             <option value="unsigned" class="bg-white dark:bg-slate-900">Unsigned (~nick)</option>
             <option value="verified" class="bg-white dark:bg-slate-900">Verified Only</option>
+          </select>
+
+          <!-- Usefulness / Signal Filter Select -->
+          <select id="usefulness-filter-select" title="Signal Filter — filter messages by content type" class="flex-1 sm:flex-initial bg-slate-50 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm font-mono text-slate-700 dark:text-slate-300 focus:outline-none focus:border-[#00c2ff] cursor-pointer">
+            <option value="all" class="bg-white dark:bg-slate-900">All Signal</option>
+            <option value="high-signal" class="bg-white dark:bg-slate-900">⚡ High Signal</option>
+            <option value="has-url" class="bg-white dark:bg-slate-900">🔗 Has URL</option>
+            <option value="has-code" class="bg-white dark:bg-slate-900">{ } Has Code / JSON</option>
+            <option value="protocol" class="bg-white dark:bg-slate-900">⚡ Protocol Only</option>
           </select>
 
           <!-- Sort Toggle Button -->
@@ -661,5 +673,11 @@
 
   <!-- Client Application Script (ES Module) -->
   <script type="module" src="/js/app.js?v=1.0.2"></script>
+
+    <!-- SCROLL TO TOP FAB -->
+    <button id="scroll-to-top-btn" class="fixed bottom-6 right-6 p-3 bg-[#00c2ff] text-white rounded-full shadow-lg hover:bg-[#009bcf] transition-all transform translate-y-16 opacity-0 z-40 touch-target" title="Scroll to Top">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+    </button>
+
 </body>
 </html>
