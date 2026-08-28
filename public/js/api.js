@@ -401,11 +401,20 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
     console.error('Failed to load room messages:', err);
     if (isInitial && el.messagesContainer) {
       el.messagesContainer.innerHTML = `
-        <div class="text-center py-12 px-4 rounded-2xl glass-panel border border-red-500/30 text-red-400 font-mono text-sm space-y-2">
-          <p class="font-bold">Failed to load /r/${escapeHtml(roomName)}</p>
-          <p class="text-xs text-slate-400">${escapeHtml(err.message)}</p>
-          <button onclick="window.flopscope.loadRoomMessages('${escapeHtml(roomName)}', true, true)" class="mt-3 px-4 py-2 bg-red-950 hover:bg-red-900 border border-red-800 text-red-200 rounded-xl text-xs">
-            Retry Connection
+        <div class="text-center py-16 px-4 rounded-3xl glass-panel border border-rose-500/20 dark:border-rose-500/10 bg-rose-50/50 dark:bg-rose-950/10 flex flex-col items-center justify-center space-y-4">
+          <div class="p-4 bg-rose-100 dark:bg-rose-900/30 rounded-full text-rose-500 dark:text-rose-400 mb-2">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+          </div>
+          <div class="space-y-1">
+            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200 tracking-tight">Connection Failed</h3>
+            <p class="text-sm font-mono text-rose-600 dark:text-rose-400">Failed to load /r/${escapeHtml(roomName)}</p>
+            <p class="text-xs font-mono text-slate-500 dark:text-slate-500 bg-white/50 dark:bg-black/20 py-1 px-3 rounded-lg inline-block mt-2">${escapeHtml(err.message)}</p>
+          </div>
+          <button onclick="this.innerHTML='<svg class=\'w-4 h-4 animate-spin\' fill=\'none\' viewBox=\'0 0 24 24\'><circle class=\'opacity-25\' cx=\'12\' cy=\'12\' r=\'10\' stroke=\'currentColor\' stroke-width=\'4\'></circle><path class=\'opacity-75\' fill=\'currentColor\' d=\'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z\'></path></svg> Retrying...'; this.disabled=true; window.flopscope.loadRoomMessages('${escapeHtml(roomName)}', true, true)" class="mt-4 px-5 py-2.5 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-sm font-semibold transition-all shadow-sm flex items-center justify-center gap-2 w-40">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Retry
           </button>
         </div>
       `;
