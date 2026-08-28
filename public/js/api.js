@@ -872,7 +872,7 @@ export function attachCardEventListeners() {
       }
     });
   }, 50);
-}\n
+}
 export function jumpToMessage(room, seq) {
   closeAgentDrawer();
 
