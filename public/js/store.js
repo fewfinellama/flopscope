@@ -12,6 +12,8 @@ export const state = {
   roomTypeFilter: 'all',
   sortOrder: 'desc',
   usefulnessFilter: 'all',
+  protocolHealth: null,       // Updated by runProbes() after each successful poll
+  lastPollMessageCount: null, // Tracks new messages per poll for velocity-sanity probe
   verificationCache: new Map(),
   unseenNewMessagesCount: 0,
   hasReachedHistoryEnd: false,
@@ -129,4 +131,9 @@ export function initElements() {
   // Toast
   el.toast = document.getElementById('toast');
   el.toastMsg = document.getElementById('toast-msg');
+
+  // Protocol Health Pill
+  el.protocolPill = document.getElementById('protocol-health-pill');
+  el.protocolPillStatus = document.getElementById('protocol-pill-status');
+  el.protocolPillDot = document.getElementById('protocol-pill-dot');
 }

@@ -4,6 +4,7 @@ import { state, el } from './store.js';
 import { showToast } from './toast.js';
 import { openAgentDrawer, openProofInspector, closeAgentDrawer } from './ui.js';
 import { applyUsefulnessFilter } from './filters.js';
+import { runProbes } from './protocol-probes.js';
 import { closeMobileRoomsSheet, closeMobileMoreSheet, closeCommandPalette } from './ui.js';
 
 import {
@@ -395,6 +396,21 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
     // Trigger background signature verifications
     verifyAllPendingSignatures();
 
+    // Run protocol probes — throttled to every 10 successful polls to protect CPU
+    state._probeCounter = (state._probeCounter || 0) + 1;
+    if (state._probeCounter % 10 === 1 || isInitial) {
+      const prevCount = state.lastPollMessageCount;
+      const newCount = incomingMessages.length;
+      state.lastPollMessageCount = newCount;
+      const newSinceLastPoll = prevCount !== null ? Math.max(0, newCount - (prevCount || 0)) : null;
+      state.protocolHealth = runProbes({
+        messages: state.messages,
+        room: roomName,
+        newMessagesSinceLastPoll: newSinceLastPoll,
+      });
+      updateProtocolPill();
+    }
+
     if (forceRefresh) {
       showToast(`Refreshed /r/${roomName}`);
     }
@@ -517,6 +533,145 @@ export async function loadOlderHistory() {
     state.isLoadingHistory = false;
     if (el.loadOlderText) el.loadOlderText.textContent = '↓ Load Older History';
     if (el.loadOlderIcon) el.loadOlderIcon.classList.remove('animate-spin');
+  }
+}
+
+// ==========================================
+// PROTOCOL HEALTH PILL
+// ==========================================
+
+export function updateProtocolPill() {
+  const health = state.protocolHealth;
+  if (!health || !el.protocolPill) return;
+
+  const failCount = health.probes.filter(p => p.status === 'fail').length;
+  const isOk = failCount === 0;
+  const isDegraded = failCount > 0;
+
+  // Update dot color
+  if (el.protocolPillDot) {
+    el.protocolPillDot.className = `w-2 h-2 rounded-full ${
+      isOk ? 'bg-emerald-400' : isDegraded ? 'bg-amber-400' : 'bg-slate-400'
+    }`;
+  }
+
+  // Update label
+  if (el.protocolPillStatus) {
+    el.protocolPillStatus.textContent = isOk ? 'Protocol OK' : `Protocol Degraded`;
+  }
+
+  // Update pill color
+  el.protocolPill.className = el.protocolPill.className
+    .replace(/text-\w+-\d+/g, '')
+    .replace(/border-\w+-\d+/g, '');
+
+  if (isOk) {
+    el.protocolPill.classList.add('text-emerald-700', 'dark:text-emerald-400', 'border-emerald-200', 'dark:border-emerald-800/60');
+    el.protocolPill.classList.remove('text-amber-700', 'dark:text-amber-400', 'border-amber-200', 'dark:border-amber-800/60');
+  } else {
+    el.protocolPill.classList.add('text-amber-700', 'dark:text-amber-400', 'border-amber-200', 'dark:border-amber-800/60');
+    el.protocolPill.classList.remove('text-emerald-700', 'dark:text-emerald-400', 'border-emerald-200', 'dark:border-emerald-800/60');
+  }
+
+  // Make visible (hidden until first probe run)
+  el.protocolPill.classList.remove('hidden');
+}
+
+export function openProtocolHealthModal() {
+  const health = state.protocolHealth;
+  if (!el.modalOverlay || !el.modalContainer) return;
+
+  const probeRows = health
+    ? health.probes.map(probe => {
+        const icon = probe.status === 'pass'
+          ? `<svg class="w-4 h-4 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`
+          : probe.status === 'fail'
+          ? `<svg class="w-4 h-4 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>`
+          : `<svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01"/></svg>`;
+
+        const statusColor = probe.status === 'pass'
+          ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800/50'
+          : probe.status === 'fail'
+          ? 'text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800/50'
+          : 'text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800';
+
+        return `
+          <div class="p-3 rounded-xl border ${statusColor} space-y-1">
+            <div class="flex items-center gap-2">
+              ${icon}
+              <span class="font-mono font-bold text-xs tracking-wide uppercase">${probe.name}</span>
+              <span class="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full ${probe.status === 'pass' ? 'bg-emerald-100 dark:bg-emerald-900/40' : probe.status === 'fail' ? 'bg-amber-100 dark:bg-amber-900/40' : 'bg-slate-200 dark:bg-slate-800'}">${probe.status}</span>
+            </div>
+            <p class="text-xs leading-relaxed pl-6 text-slate-600 dark:text-slate-400 font-sans">${probe.detail || ''}</p>
+          </div>`;
+      }).join('')
+    : `<p class="text-slate-400 text-sm text-center py-6">No probe results yet. Results appear after the first successful poll.</p>`;
+
+  const overallStatus = health?.status || 'unknown';
+  const overallColor = overallStatus === 'ok'
+    ? 'text-emerald-600 dark:text-emerald-400'
+    : overallStatus === 'degraded'
+    ? 'text-amber-600 dark:text-amber-400'
+    : 'text-slate-500';
+
+  const lastRunText = health?.lastRun
+    ? `Last run ${Math.round((Date.now() - health.lastRun) / 1000)}s ago`
+    : 'Not yet run';
+
+  el.modalContainer.innerHTML = `
+    <div class="p-5 sm:p-6 space-y-5 text-slate-800 dark:text-slate-200">
+
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5 ${overallColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          <h3 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">Protocol Health Monitor</h3>
+        </div>
+        <button id="modal-close-btn" class="text-slate-400 hover:text-slate-900 dark:hover:text-white p-1 transition-colors rounded-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-mono">${lastRunText}</p>
+          <p class="text-lg font-bold font-mono ${overallColor} mt-0.5">Overall: ${overallStatus.toUpperCase()}</p>
+        </div>
+        <button id="run-probes-btn" class="px-4 py-2 bg-[#00c2ff] hover:bg-[#009bcf] text-white rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Run Now
+        </button>
+      </div>
+
+      <div class="space-y-2.5">
+        <h4 class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Probe Results</h4>
+        ${probeRows}
+      </div>
+
+      <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans text-center pt-2">
+        Probes are read-only and diagnostic — never accusatory. Failures are signals, not verdicts.
+      </p>
+    </div>
+  `;
+
+  el.modalOverlay.classList.remove('hidden');
+  el.modalOverlay.classList.add('flex');
+
+  const closeBtn = document.getElementById('modal-close-btn');
+  if (closeBtn) closeBtn.onclick = () => { import('./ui.js').then(m => m.closeModal()); };
+
+  const runBtn = document.getElementById('run-probes-btn');
+  if (runBtn) {
+    runBtn.onclick = () => {
+      state.protocolHealth = runProbes({
+        messages: state.messages,
+        room: state.currentRoom,
+        newMessagesSinceLastPoll: state.lastPollMessageCount,
+      });
+      updateProtocolPill();
+      openProtocolHealthModal(); // re-render with fresh results
+    };
   }
 }
 

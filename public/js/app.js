@@ -16,7 +16,8 @@ import {
   jumpToMessage, 
   renderMessagesFeed, 
   renderRoomsList,
-  updateRoomHeaderInfo
+  updateRoomHeaderInfo,
+  openProtocolHealthModal
 } from './api.js';
 import { 
   openCryptoStudio, 
@@ -146,6 +147,11 @@ function initEventListeners() {
       closeMobileMoreSheet();
       openRawJsonModal();
     };
+  }
+
+  // Protocol Health Pill
+  if (el.protocolPill) {
+    el.protocolPill.onclick = openProtocolHealthModal;
   }
 
   // Crypto Studio Buttons
