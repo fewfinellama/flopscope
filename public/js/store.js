@@ -69,6 +69,9 @@ export function initElements() {
   el.statVerified = document.getElementById('stat-verified');
   el.statUnique = document.getElementById('stat-unique');
   el.statVelocity = document.getElementById('stat-velocity');
+  el.statHealth = document.getElementById('stat-health');
+  el.statHealthCard = document.getElementById('stat-health-card');
+  el.healthSparkline = document.getElementById('health-sparkline-container');
 
   // Controls & Filter
   el.searchInput = document.getElementById('search-input');

@@ -336,7 +336,15 @@
         </div>
 
         <!-- STATS CARDS -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div id="stat-health-card" class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-700 relative overflow-hidden group">
+            <div class="flex items-center justify-between z-10">
+              <span class="text-xs font-mono text-emerald-600 dark:text-emerald-400">Health Score</span>
+              <div id="health-sparkline-container" class="opacity-80 group-hover:opacity-100 transition-opacity"></div>
+            </div>
+            <span id="stat-health" class="text-xl sm:text-2xl font-bold font-mono text-emerald-700 dark:text-emerald-300 mt-1 z-10">--</span>
+          </div>
+
           <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all hover:border-slate-300 dark:hover:border-slate-700">
             <span class="text-xs font-mono text-slate-500 dark:text-slate-400">Total in Ring</span>
             <span id="stat-total" class="text-xl sm:text-2xl font-bold font-mono text-slate-900 dark:text-white mt-1">0</span>
@@ -357,7 +365,7 @@
             <span id="stat-unique" class="text-xl sm:text-2xl font-bold font-mono text-indigo-700 dark:text-indigo-300 mt-1">0</span>
           </div>
 
-          <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all hover:border-amber-300 dark:hover:border-amber-700 col-span-2 sm:col-span-1">
+          <div class="bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 p-3.5 rounded-xl flex flex-col transition-all hover:border-amber-300 dark:hover:border-amber-700">
             <span class="text-xs font-mono text-amber-600 dark:text-amber-400">Chat Velocity</span>
             <span id="stat-velocity" class="text-xl sm:text-2xl font-bold font-mono text-amber-700 dark:text-amber-300 mt-1">0 <span class="text-xs font-normal text-slate-500">msg/min</span></span>
           </div>

@@ -5,6 +5,7 @@ import { showToast } from './toast.js';
 import { openAgentDrawer, openProofInspector, closeAgentDrawer } from './ui.js';
 import { applyUsefulnessFilter } from './filters.js';
 import { runProbes } from './protocol-probes.js';
+import { saveRoomSnapshot, getRoomSnapshots, generateSparklineSvg } from './snapshots.js';
 import { isBoilerplate } from './farming-patterns.js';
 import { closeMobileRoomsSheet, closeMobileMoreSheet, closeCommandPalette } from './ui.js';
 
@@ -766,28 +767,62 @@ export function updateRoomStats() {
   const metrics = computeRoomHealth(state.currentRoom, state.messages);
   analyzeDids(state.currentRoom, state.messages);
   state.roomMetrics[state.currentRoom] = metrics;
+  
+  // Save snapshot and draw sparkline
+  saveRoomSnapshot(metrics);
+  const snapshots = getRoomSnapshots(state.currentRoom);
+  
   const healthPill = document.getElementById("health-pill-trigger");
   const healthText = document.getElementById("health-pill-text");
+  
+  let label = "Analyzing...";
+  let colorClass = "text-slate-600 dark:text-slate-400";
+  let sparklineColor = "text-slate-400";
+  
+  if (metrics.sampleSize >= 10) {
+    if (metrics.healthScore >= 80) {
+      label = "Excellent";
+      colorClass = "text-emerald-700 dark:text-emerald-300";
+      sparklineColor = "text-emerald-500";
+    } else if (metrics.healthScore >= 50) {
+      label = "Moderate";
+      colorClass = "text-amber-700 dark:text-amber-300";
+      sparklineColor = "text-amber-500";
+    } else {
+      label = "Poor";
+      colorClass = "text-rose-700 dark:text-rose-300";
+      sparklineColor = "text-rose-500";
+    }
+  }
+
+  // Update Header Pill
   if (healthPill && healthText) {
-    healthPill.classList.remove("hidden", "bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "bg-slate-100", "border-slate-200", "text-slate-600", "dark:bg-slate-800", "dark:border-slate-700", "dark:text-slate-400");
+    healthPill.classList.remove("hidden", "bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "bg-slate-100", "border-slate-200", "text-slate-600", "dark:bg-slate-800", "dark:border-slate-700", "dark:text-slate-400", "shadow-emerald-500/10", "shadow-amber-500/10", "shadow-rose-500/10");
     healthPill.classList.add("flex");
+    
     if (metrics.sampleSize < 10) {
       healthPill.classList.add("bg-slate-100", "border-slate-200", "text-slate-600", "dark:bg-slate-800", "dark:border-slate-700", "dark:text-slate-400");
       healthText.textContent = "Analyzing...";
     } else {
-      let label = "";
-      if (metrics.healthScore >= 80) {
-        healthPill.classList.add("bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "shadow-emerald-500/10");
-        label = "Excellent";
-      } else if (metrics.healthScore >= 50) {
-        healthPill.classList.add("bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "shadow-amber-500/10");
-        label = "Moderate";
-      } else {
-        healthPill.classList.add("bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "shadow-rose-500/10");
-        label = "Poor";
-      }
+      if (metrics.healthScore >= 80) healthPill.classList.add("bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "shadow-emerald-500/10");
+      else if (metrics.healthScore >= 50) healthPill.classList.add("bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "shadow-amber-500/10");
+      else healthPill.classList.add("bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "shadow-rose-500/10");
+      
       healthText.textContent = `${metrics.healthScore}% Signal · ${label}`;
     }
+  }
+  
+  // Update Health Metric Card
+  if (el.statHealthCard) {
+    el.statHealthCard.onclick = () => openHealthTransparencyModal();
+  }
+  if (el.statHealth) {
+    el.statHealth.className = `text-xl sm:text-2xl font-bold font-mono mt-1 z-10 transition-colors ${colorClass}`;
+    el.statHealth.textContent = metrics.sampleSize < 10 ? '--' : `${metrics.healthScore}%`;
+  }
+  
+  if (el.healthSparkline) {
+    el.healthSparkline.innerHTML = generateSparklineSvg(snapshots, 60, 24, sparklineColor);
   }
 
   if (el.statTotal) el.statTotal.textContent = total.toLocaleString();
@@ -1180,4 +1215,91 @@ export function jumpToMessage(room, seq) {
       showToast(`Message #${seq} is too old to be in the recent feed. Load more history first.`);
     }
   }
+}
+
+
+export function openHealthTransparencyModal() {
+  const metrics = state.roomMetrics[state.currentRoom];
+  if (!metrics) return;
+
+  const titleColor = metrics.healthScore >= 80 ? 'text-emerald-600 dark:text-emerald-400' 
+    : metrics.healthScore >= 50 ? 'text-amber-600 dark:text-amber-400' 
+    : 'text-rose-600 dark:text-rose-400';
+
+  el.modalContainer.innerHTML = `
+    <div class="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
+      <h3 class="text-base font-bold font-mono text-slate-800 dark:text-slate-100 flex items-center gap-2">
+        <svg class="w-5 h-5 ${titleColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Room Health Scoring (v1)
+      </h3>
+      <button id="modal-close-btn" class="text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors p-1 rounded-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    
+    <div class="p-4 sm:p-5 overflow-y-auto max-h-[80vh] space-y-6">
+      
+      <div class="bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 p-4 text-center">
+        <div class="text-sm font-mono text-slate-500 dark:text-slate-400 mb-1">Current Health Score</div>
+        <div class="text-5xl font-bold font-mono ${titleColor}">${metrics.sampleSize < 10 ? '--' : metrics.healthScore}</div>
+        <div class="text-xs font-mono text-slate-500 dark:text-slate-400 mt-2">Based on the last ${metrics.sampleSize} messages</div>
+      </div>
+      
+      <div class="space-y-3">
+        <h4 class="text-xs font-mono font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Formula Breakdown</h4>
+        <div class="bg-slate-100/50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 divide-y divide-slate-200 dark:divide-slate-800 text-sm font-mono">
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Spam Penalty</span> (Max 35)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">${Math.round(metrics.spamShare*100)}% of messages matched farming patterns</div>
+            </div>
+            <div class="font-bold text-rose-500 dark:text-rose-400">-${metrics.breakdown.spamPenalty || 0}</div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Signal Bonus</span> (Max 25)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">${Math.round(metrics.signalShare*100)}% had meaningful length or links</div>
+            </div>
+            <div class="font-bold text-emerald-500 dark:text-emerald-400">+${metrics.breakdown.signalBonus || 0}</div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Concentration Penalty</span> (Max 20)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">Herfindahl Index: ${metrics.authorConcentration.toFixed(2)} (1.0 = single author)</div>
+            </div>
+            <div class="font-bold text-amber-500 dark:text-amber-400">-${metrics.breakdown.concentrationPenalty || 0}</div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Reciprocity Bonus</span> (Max 15)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">${Math.round(metrics.reciprocity*100)}% of messages were replied to</div>
+            </div>
+            <div class="font-bold text-emerald-500 dark:text-emerald-400">+${metrics.breakdown.reciprocityBonus || 0}</div>
+          </div>
+          
+          <div class="flex items-center justify-between p-3">
+            <div class="text-slate-700 dark:text-slate-300">
+              <span class="font-bold">Persistence Bonus</span> (Max 5)
+              <div class="text-[10px] text-slate-500 font-sans mt-0.5">${metrics.uniquePersistentDids} DIDs with >= 2 messages</div>
+            </div>
+            <div class="font-bold text-emerald-500 dark:text-emerald-400">+${metrics.breakdown.persistenceBonus || 0}</div>
+          </div>
+          
+        </div>
+      </div>
+      
+      <p class="text-[10px] text-slate-400 dark:text-slate-500 font-sans text-center">
+        The Health Score is a read-only diagnostic signal, not a moral judgment.
+      </p>
+    </div>
+  `;
+
+  el.modalOverlay.classList.remove('hidden');
+  el.modalOverlay.classList.add('flex');
+  const closeBtn = document.getElementById('modal-close-btn');
+  if (closeBtn) closeBtn.onclick = () => { import('./ui.js').then(m => m.closeModal()); };
 }
