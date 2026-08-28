@@ -85,6 +85,10 @@ export async function openAgentDrawer(did) {
     try {
     const clientStats = state.didStats?.get(did);
     if (clientStats) {
+      let origRatioColor = "!bg-emerald-50/50 !border-emerald-200 dark:!bg-emerald-950/20 dark:!border-emerald-800/50";
+      if (clientStats.originalityScore < 0.5) origRatioColor = "!bg-rose-50/50 !border-rose-200 dark:!bg-rose-950/20 dark:!border-rose-800/50";
+      else if (clientStats.originalityScore < 0.8) origRatioColor = "!bg-amber-50/50 !border-amber-200 dark:!bg-amber-950/20 dark:!border-amber-800/50";
+
       let flagsHtml = "";
       clientStats.flags.forEach(flag => {
         flagsHtml += `<span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-400 border border-amber-300 dark:border-amber-800/80 uppercase">${flag}</span>`;
@@ -94,14 +98,14 @@ export async function openAgentDrawer(did) {
       document.getElementById("drawer-client-stats").innerHTML = `
         <div class="space-y-2 pt-1">
           <h4 class="text-xs font-mono uppercase font-bold tracking-wider text-slate-500 dark:text-slate-400">Local Reputation Score</h4>
-          <div class="p-3.5 rounded-xl glass-panel shadow-sm flex items-center justify-between gap-3">
+          <div class="p-3.5 rounded-xl glass-panel shadow-sm flex items-center justify-between gap-3 ${origRatioColor}">
             <div class="flex-1 min-w-0">
               <span class="block text-slate-800 dark:text-slate-200 font-bold truncate">Originality Ratio</span>
               <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Based on n-gram similarity</span>
             </div>
             <span class="font-bold text-cyan-700 dark:text-[#00c2ff] whitespace-nowrap text-xl font-mono">${(clientStats.originalityScore * 100).toFixed(0)}%</span>
           </div>
-          <div class="p-3.5 rounded-xl glass-panel shadow-sm">
+          <div class="p-3.5 rounded-xl glass-panel shadow-sm !bg-indigo-50/30 !border-indigo-200 dark:!bg-indigo-950/20 dark:!border-indigo-800/50">
              <span class="text-slate-500 dark:text-slate-400 text-[10px] font-mono font-bold uppercase tracking-wider block mb-2">Detected Flags</span>
              <div class="flex flex-wrap gap-2">
                ${flagsHtml}
@@ -127,18 +131,18 @@ export async function openAgentDrawer(did) {
     if (detailsEl) {
       detailsEl.innerHTML = `
         <!-- Public Key Breakdown -->
-        <div class="p-3.5 rounded-xl glass-panel shadow-sm space-y-1.5 font-mono text-xs">
+        <div class="p-3.5 rounded-xl glass-panel shadow-sm !bg-slate-50/50 !border-slate-200 dark:!bg-slate-900/40 dark:!border-slate-800/60 space-y-1.5 font-mono text-xs">
           <span class="text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-xs">32-Byte Public Key (Hex)</span>
           <p class="text-slate-800 dark:text-slate-200 font-medium break-all select-all">${pubKeyHex}</p>
         </div>
 
         <!-- Lifetime Stats -->
         <div class="grid grid-cols-2 gap-3">
-          <div class="p-3.5 rounded-xl glass-panel shadow-sm">
+          <div class="p-3.5 rounded-xl glass-panel shadow-sm !bg-violet-50/40 !border-violet-200 dark:!bg-violet-950/20 dark:!border-violet-800/50">
             <span class="text-slate-500 dark:text-slate-400 text-xs font-mono font-semibold uppercase tracking-wider">Archived Msgs</span>
             <p class="text-xl font-bold font-mono text-slate-900 dark:text-white mt-1">${(stats.total_messages || recentMessages.length).toLocaleString()}</p>
           </div>
-          <div class="p-3.5 rounded-xl glass-panel shadow-sm">
+          <div class="p-3.5 rounded-xl glass-panel shadow-sm !bg-cyan-50/40 !border-cyan-200 dark:!bg-cyan-950/20 dark:!border-cyan-800/50">
             <span class="text-slate-500 dark:text-slate-400 text-xs font-mono font-semibold uppercase tracking-wider">Rooms Visited</span>
             <p class="text-xl font-bold font-mono text-cyan-700 dark:text-[#00c2ff] mt-1">${stats.rooms_count || 1}</p>
           </div>
