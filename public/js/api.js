@@ -1,3 +1,4 @@
+import { computeRoomHealth } from './health-scorer.js';
 import { state, el } from './store.js';
 import { showToast } from './toast.js';
 import { openAgentDrawer, openProofInspector } from './ui.js';
@@ -449,6 +450,10 @@ export function updateRoomStats() {
   const uniqueDids = new Set(signedList.map((m) => m.from));
   const verifiedCount = Array.from(state.verificationCache.values()).filter((v) => v.valid).length;
   const velocity = calculateChatVelocity(state.messages);
+  const metrics = computeRoomHealth(state.currentRoom, state.messages);
+  state.roomMetrics[state.currentRoom] = metrics;
+  const statHealth = document.getElementById("stat-health");
+  if (statHealth) statHealth.innerHTML = `${metrics.healthScore}<span class="text-xs font-normal text-slate-500">%</span>`;
 
   if (el.statTotal) el.statTotal.textContent = total.toLocaleString();
   if (el.statSigned) el.statSigned.textContent = signedList.length.toLocaleString();

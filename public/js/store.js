@@ -2,6 +2,7 @@ export const state = {
   currentRoom: 'lobby',
   messages: [],
   rooms: [],
+  roomMetrics: {},
   pollingInterval: 10,
   pollingTimer: null,
   filter: 'all',
