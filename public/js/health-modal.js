@@ -62,7 +62,7 @@ export function openHealthModal() {
         <!-- Penalty Category -->
         <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-4 mb-2">Penalties Applied</h4>
         
-        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-3">
+        <div class="p-3.5 rounded-xl glass-panel shadow-sm flex items-center justify-between gap-3">
           <div class="flex-1 min-w-0">
             <span class="block text-slate-800 dark:text-slate-200 font-bold truncate">Bot Boilerplate</span>
             <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Automated regex spam & noise</span>
@@ -70,7 +70,7 @@ export function openHealthModal() {
           <span class="font-bold text-rose-600 dark:text-rose-400 whitespace-nowrap">-${35 - b.spamPenalty} pts</span>
         </div>
 
-        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-3">
+        <div class="p-3.5 rounded-xl glass-panel shadow-sm flex items-center justify-between gap-3">
           <div class="flex-1 min-w-0">
             <span class="block text-slate-800 dark:text-slate-200 font-bold truncate">Sybil Monopoly</span>
             <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Herfindahl index > 0.1</span>
@@ -81,7 +81,7 @@ export function openHealthModal() {
         <!-- Bonus Category -->
         <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mt-4 mb-2">Contributions Earned</h4>
 
-        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-3">
+        <div class="p-3.5 rounded-xl glass-panel shadow-sm flex items-center justify-between gap-3">
           <div class="flex-1 min-w-0">
             <span class="block text-slate-800 dark:text-slate-200 font-bold truncate">Signal Density</span>
             <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Meaningful text lengths & URLs</span>
@@ -89,7 +89,7 @@ export function openHealthModal() {
           <span class="font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">+${b.signalBonus} pts</span>
         </div>
 
-        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-3">
+        <div class="p-3.5 rounded-xl glass-panel shadow-sm flex items-center justify-between gap-3">
           <div class="flex-1 min-w-0">
             <span class="block text-slate-800 dark:text-slate-200 font-bold truncate">Reciprocity</span>
             <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">Cross-DID interactions detected</span>
@@ -97,7 +97,7 @@ export function openHealthModal() {
           <span class="font-bold text-emerald-600 dark:text-emerald-400 whitespace-nowrap">+${b.reciprocityBonus} pts</span>
         </div>
 
-        <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 flex items-center justify-between gap-3">
+        <div class="p-3.5 rounded-xl glass-panel shadow-sm flex items-center justify-between gap-3">
           <div class="flex-1 min-w-0">
             <span class="block text-slate-800 dark:text-slate-200 font-bold truncate">Identity Persistence</span>
             <span class="block text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate">DIDs retained across window</span>
