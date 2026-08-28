@@ -813,8 +813,16 @@ export function updateRoomStats() {
   }
   
   // Update Health Metric Card
-  if (healthPill) {
-    healthPill.onclick = () => openHealthTransparencyModal();
+  const healthModalTrigger = document.getElementById("health-modal-trigger");
+  if (healthModalTrigger) {
+    if (metrics.sampleSize >= 10) {
+      healthModalTrigger.classList.remove('hidden');
+      healthModalTrigger.classList.add('flex');
+      healthModalTrigger.onclick = () => openHealthTransparencyModal();
+    } else {
+      healthModalTrigger.classList.add('hidden');
+      healthModalTrigger.classList.remove('flex');
+    }
   }
   
   if (el.statHealth) {
