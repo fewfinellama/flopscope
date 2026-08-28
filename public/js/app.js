@@ -7,6 +7,7 @@ import { state, el, initElements } from './store.js';
 import { showToast } from './toast.js';
 import { openHealthModal } from './health-modal.js';
 import { initTheme, toggleTheme, initDensity, toggleDensity } from './theme.js';
+import { initCompareModal } from './compare.js';
 import { 
   getRoomFromUrl, 
   switchRoom, 
@@ -366,6 +367,7 @@ export async function initApp() {
   if (healthBtn) healthBtn.addEventListener("click", openHealthModal);
   initTheme();
   initDensity();
+  initCompareModal();
   initEventListeners();
 
   // Read initial room from URL
