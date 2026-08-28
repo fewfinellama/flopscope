@@ -125,10 +125,10 @@ export function highlightActiveRoom(roomName) {
     const isTarget = btn.dataset.room === roomName;
     if (isTarget) {
       btn.classList.add('bg-cyan-500/15', 'border-cyan-500/40', 'text-[#00c2ff]');
-      btn.classList.remove('bg-slate-50', 'dark:bg-slate-900/60', 'text-slate-700', 'dark:text-slate-300');
+      btn.classList.remove('bg-slate-100', 'dark:bg-slate-900/60', 'text-slate-600', 'dark:text-slate-300');
     } else {
       btn.classList.remove('bg-cyan-500/15', 'border-cyan-500/40', 'text-[#00c2ff]');
-      btn.classList.add('bg-slate-50', 'dark:bg-slate-900/60', 'text-slate-700', 'dark:text-slate-300');
+      btn.classList.add('bg-slate-100', 'dark:bg-slate-900/60', 'text-slate-600', 'dark:text-slate-300');
     }
   });
 }
@@ -223,12 +223,12 @@ export function createRoomButtonHtml(r) {
   const isActive = r.name === state.currentRoom;
   const activeClass = isActive
     ? 'bg-cyan-500/15 border-cyan-500/40 text-[#00c2ff] font-semibold'
-    : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300';
+    : 'bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300';
 
   return `
     <button
       data-room="${escapeHtml(r.name)}"
-      class="room-nav-btn w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800/80 text-left transition-all duration-150 flex flex-col gap-1.5 ${activeClass}"
+      class="room-nav-btn w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700/80 text-left transition-all duration-150 flex flex-col gap-1.5 ${activeClass}"
     >
       <div class="flex items-center justify-between gap-2">
         <span class="font-mono text-sm tracking-tight truncate flex items-center gap-1.5">
@@ -384,8 +384,8 @@ export function updateCacheBadge(cached, ageMs = 0) {
   if (cached) {
     const sec = Math.round(ageMs / 1000);
     el.cacheBadge.innerHTML = `
-      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800" title="Serving from in-memory zero-trust cache">
-        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/80" title="Serving from in-memory zero-trust cache">
+        <span class="w-2 h-2 rounded-full bg-emerald-1000"></span>
         Cache (${sec}s)
       </span>
     `;
@@ -455,21 +455,21 @@ export function updateRoomStats() {
   const healthPill = document.getElementById("health-pill-trigger");
   const healthText = document.getElementById("health-pill-text");
   if (healthPill && healthText) {
-    healthPill.classList.remove("hidden", "bg-emerald-50", "border-emerald-200", "text-emerald-700", "dark:bg-emerald-950/50", "dark:border-emerald-800", "dark:text-emerald-400", "bg-amber-50", "border-amber-200", "text-amber-700", "dark:bg-amber-950/50", "dark:border-amber-800", "dark:text-amber-400", "bg-rose-50", "border-rose-200", "text-rose-700", "dark:bg-rose-950/50", "dark:border-rose-800", "dark:text-rose-400", "bg-slate-50", "border-slate-200", "text-slate-700", "dark:bg-slate-900/50", "dark:border-slate-800", "dark:text-slate-400");
+    healthPill.classList.remove("hidden", "bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "bg-slate-100", "border-slate-200", "text-slate-600", "dark:bg-slate-800", "dark:border-slate-700", "dark:text-slate-400");
     healthPill.classList.add("flex");
     if (metrics.sampleSize < 10) {
-      healthPill.classList.add("bg-slate-50", "border-slate-200", "text-slate-700", "dark:bg-slate-900/50", "dark:border-slate-800", "dark:text-slate-400");
+      healthPill.classList.add("bg-slate-100", "border-slate-200", "text-slate-600", "dark:bg-slate-800", "dark:border-slate-700", "dark:text-slate-400");
       healthText.textContent = "Analyzing...";
     } else {
       let label = "";
       if (metrics.healthScore >= 80) {
-        healthPill.classList.add("bg-emerald-50", "border-emerald-200", "text-emerald-700", "dark:bg-emerald-950/50", "dark:border-emerald-800", "dark:text-emerald-400", "shadow-emerald-500/10");
+        healthPill.classList.add("bg-emerald-100", "border-emerald-300", "text-emerald-800", "dark:bg-emerald-950/80", "dark:border-emerald-800/80", "dark:text-emerald-400", "shadow-emerald-500/10");
         label = "Excellent";
       } else if (metrics.healthScore >= 50) {
-        healthPill.classList.add("bg-amber-50", "border-amber-200", "text-amber-700", "dark:bg-amber-950/50", "dark:border-amber-800", "dark:text-amber-400", "shadow-amber-500/10");
+        healthPill.classList.add("bg-amber-100", "border-amber-300", "text-amber-800", "dark:bg-amber-950/80", "dark:border-amber-800/80", "dark:text-amber-400", "shadow-amber-500/10");
         label = "Moderate";
       } else {
-        healthPill.classList.add("bg-rose-50", "border-rose-200", "text-rose-700", "dark:bg-rose-950/50", "dark:border-rose-800", "dark:text-rose-400", "shadow-rose-500/10");
+        healthPill.classList.add("bg-rose-100", "border-rose-300", "text-rose-800", "dark:bg-rose-950/80", "dark:border-rose-800/80", "dark:text-rose-400", "shadow-rose-500/10");
         label = "Poor";
       }
       healthText.textContent = `${metrics.healthScore}% Signal · ${label}`;
@@ -594,7 +594,7 @@ export function renderMessagesFeed() {
           <svg class="w-4 h-4 text-cyan-600 dark:text-[#00c2ff] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
           <span class="text-slate-600 dark:text-slate-400 font-semibold truncate">Filtering by: <span class="text-cyan-700 dark:text-[#00c2ff] font-bold select-all">${state.filterDid}</span></span>
         </div>
-        <button id="clear-did-filter-btn" class="flex-shrink-0 px-2.5 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg transition-colors font-bold tracking-tight">Clear</button>
+        <button id="clear-did-filter-btn" class="flex-shrink-0 px-2.5 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg transition-colors font-bold tracking-tight">Clear</button>
       </div>
     `;
   }
@@ -605,7 +605,7 @@ export function renderMessagesFeed() {
         <svg class="w-8 h-8 text-slate-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
         </svg>
-        <p class="font-bold text-slate-700 dark:text-slate-300">No messages match your criteria</p>
+        <p class="font-bold text-slate-600 dark:text-slate-300">No messages match your criteria</p>
         <p class="text-xs text-slate-500">Try clearing your search query or changing filter options</p>
       </div>
     `;
@@ -673,7 +673,7 @@ export function createMessageCardHtml(msg) {
   const avatarHtml = isSigned
     ? generateIdenticonSvg(msg.from, 36)
     : `
-      <div class="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-mono font-bold text-slate-700 dark:text-slate-300 text-xs shadow-sm flex-shrink-0">
+      <div class="w-9 h-9 rounded-xl bg-slate-200 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 flex items-center justify-center font-mono font-bold text-slate-600 dark:text-slate-300 text-xs shadow-sm flex-shrink-0">
         ${escapeHtml((msg.from || 'U').charAt(0).toUpperCase())}
       </div>
     `;
@@ -702,7 +702,7 @@ export function createMessageCardHtml(msg) {
               ${
                 isSigned
                   ? `<button data-action="open-agent" data-did="${escapeHtml(msg.from)}" class="font-mono text-xs sm:text-sm font-semibold text-cyan-600 dark:text-[#00c2ff] hover:underline truncate" title="Inspect Agent Profile & Lifetime History">${senderDisplay}</button>`
-                  : `<span class="font-mono text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 truncate">${senderDisplay}</span>`
+                  : `<span class="font-mono text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 truncate">${senderDisplay}</span>`
               }
               ${
                 isSigned
@@ -736,7 +736,7 @@ export function createMessageCardHtml(msg) {
       </div>
 
       <!-- Message Footer / Action Bar -->
-      <div class="pt-2 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between gap-2 flex-wrap text-xs font-mono text-slate-500 dark:text-slate-400">
+      <div class="pt-2 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-between gap-2 flex-wrap text-xs font-mono text-slate-500 dark:text-slate-400">
         <div class="flex items-center gap-2 flex-wrap">
           ${
             msg.nonce
