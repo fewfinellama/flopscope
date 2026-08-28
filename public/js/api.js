@@ -183,11 +183,24 @@ export function renderRoomsList() {
     });
 
     if (filtered.length === 0) {
-      el.roomsList.innerHTML = `
-        <div class="text-center py-6 text-slate-500 text-xs font-mono">
-          No rooms matching "${escapeHtml(desktopSearch)}" in this category
-        </div>
-      `;
+      if (desktopSearch.length > 0) {
+        const targetRoom = escapeHtml(desktopSearch).replace(/[^a-z0-9-]/gi, '');
+        el.roomsList.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs font-mono space-y-3">
+            <p>No active rooms matching "${escapeHtml(desktopSearch)}"</p>
+            <button data-room="${targetRoom}" class="room-nav-btn btn-interactive px-4 py-2 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800 rounded-xl font-bold font-mono inline-flex items-center gap-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Jump to /r/${targetRoom}
+            </button>
+          </div>
+        `;
+      } else {
+        el.roomsList.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs font-mono">
+            No rooms matching in this category
+          </div>
+        `;
+      }
     } else {
       el.roomsList.innerHTML = filtered.map((r) => createRoomButtonHtml(r)).join('');
     }
@@ -201,11 +214,24 @@ export function renderRoomsList() {
     });
 
     if (filtered.length === 0) {
-      el.mobileRoomsList.innerHTML = `
-        <div class="text-center py-6 text-slate-500 text-xs font-mono">
-          No rooms matching "${escapeHtml(mobileSearch)}" in this category
-        </div>
-      `;
+      if (mobileSearch.length > 0) {
+        const targetRoom = escapeHtml(mobileSearch).replace(/[^a-z0-9-]/gi, '');
+        el.mobileRoomsList.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs font-mono space-y-3">
+            <p>No active rooms matching "${escapeHtml(mobileSearch)}"</p>
+            <button data-room="${targetRoom}" class="room-nav-btn btn-interactive px-4 py-2 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-[#00c2ff] border border-cyan-200 dark:border-cyan-800 rounded-xl font-bold font-mono inline-flex items-center gap-2">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+              Jump to /r/${targetRoom}
+            </button>
+          </div>
+        `;
+      } else {
+        el.mobileRoomsList.innerHTML = `
+          <div class="text-center py-6 text-slate-500 text-xs font-mono">
+            No rooms matching in this category
+          </div>
+        `;
+      }
     } else {
       el.mobileRoomsList.innerHTML = filtered.map((r) => createRoomButtonHtml(r, true)).join('');
     }
@@ -563,7 +589,9 @@ export function renderMessagesFeed() {
     // 1. Text & DID Search
     if (query) {
       const matchText = (m.rawText || m.text || '').toLowerCase().includes(query);
-      const matchFrom = (m.from || '').toLowerCase().includes(query);
+      const fullFrom = (m.from || '').toLowerCase();
+      const truncFrom = (m.from && m.from.startsWith('did:key:')) ? truncateDid(m.from).toLowerCase() : fullFrom;
+      const matchFrom = fullFrom.includes(query) || truncFrom.includes(query);
       const matchSeq = String(m.seq).includes(query);
       const matchNonce = m.nonce ? String(m.nonce).toLowerCase().includes(query) : false;
       if (!matchText && !matchFrom && !matchSeq && !matchNonce) return false;
