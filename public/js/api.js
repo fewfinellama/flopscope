@@ -546,7 +546,17 @@ export function mergeMessages(newBatch) {
       existingMap.set(m.seq, m);
     }
   }
-  state.messages = Array.from(existingMap.values());
+  
+  // Sort descending by sequence number and cap at 1000 to prevent OOM
+  const merged = Array.from(existingMap.values());
+  merged.sort((a, b) => b.seq - a.seq);
+  
+  // Cap at 1000 messages (Performance tuning for high-velocity rooms)
+  if (merged.length > 1000) {
+    merged.length = 1000;
+  }
+  
+  state.messages = merged;
 }
 
 export function updateCacheBadge(cached, ageMs = 0) {
@@ -985,7 +995,12 @@ export function renderMessagesFeed() {
     return;
   }
 
-  html += filtered.map((m) => createMessageCardHtml(m)).join('');
+  // Cap DOM rendering at 500 messages to prevent UI freezing (Performance Tuning)
+  const domLimit = 500;
+  html += filtered.slice(0, domLimit).map((m) => createMessageCardHtml(m)).join('');
+  if (filtered.length > domLimit) {
+    html += `<div class="text-center py-4 text-xs text-slate-500 font-mono">+ ${filtered.length - domLimit} more messages not rendered to save memory</div>`;
+  }
   el.messagesContainer.innerHTML = html;
 
   // Attach clear listener if button exists

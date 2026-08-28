@@ -338,6 +338,9 @@ app.get('/api/health', (req, res) => {
  */
 app.use((req, res, next) => {
   if (req.method === 'GET' && !req.path.startsWith('/api/')) {
+    if (req.path === '/faq') {
+      return res.sendFile(path.join(__dirname, 'public', 'faq.html'));
+    }
     return res.sendFile(path.join(__dirname, 'public', 'index.html'));
   }
   if (req.path.startsWith('/api/')) {

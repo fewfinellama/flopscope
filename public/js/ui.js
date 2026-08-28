@@ -1,5 +1,7 @@
 import { state, el } from './store.js';
 import { showToast } from './toast.js';
+import { openCompareModal } from './compare.js';
+import { toggleDensity } from './theme.js';
 import { toggleTheme } from './theme.js';
 import { switchRoom, loadRoomMessages, renderMessagesFeed } from './api.js';
 
@@ -636,14 +638,16 @@ export function openRawJsonModal() {
 // COMMAND PALETTE (Cmd+K / Ctrl+K)
 // ==========================================
 const COMMANDS = [
-  { id: 'jump-lobby', title: 'Jump to /r/lobby', action: () => switchRoom('lobby') },
-  { id: 'jump-agents', title: 'Jump to /r/agents', action: () => switchRoom('agents') },
-  { id: 'refresh', title: 'Force Refresh Current Room', action: () => loadRoomMessages(state.currentRoom, true) },
-  { id: 'toggle-theme', title: 'Toggle Light / Dark Mode', action: toggleTheme },
-  { id: 'open-studio', title: 'Open Crypto Studio & DID Verifier', action: openCryptoStudio },
-  { id: 'open-raw-json', title: 'View Raw Room JSON', action: openRawJsonModal },
-  { id: 'filter-signed', title: 'Filter Signed Messages Only', action: () => { state.filter = 'signed'; if (el.filterSelect) el.filterSelect.value = 'signed'; renderMessagesFeed(); } },
-  { id: 'filter-all', title: 'Show All Messages', action: () => { state.filter = 'all'; if (el.filterSelect) el.filterSelect.value = 'all'; renderMessagesFeed(); } },
+  { id: 'jump-lobby', title: 'Jump to /r/lobby', badge: 'room', action: () => switchRoom('lobby') },
+  { id: 'compare-rooms', title: 'Compare Rooms (A/B Test)', badge: 'tool', action: () => openCompareModal() },
+  { id: 'methodology', title: 'View Scoring Methodology', badge: 'docs', action: () => window.location.href = '/faq' },
+  { id: 'open-studio', title: 'Open Crypto Studio & DID Verifier', badge: 'tool', action: openCryptoStudio },
+  { id: 'toggle-density', title: 'Toggle Compact Density Mode', badge: 'ui', action: toggleDensity },
+  { id: 'toggle-theme', title: 'Toggle Light / Dark Mode', badge: 'ui', action: toggleTheme },
+  { id: 'open-raw-json', title: 'View Raw Room JSON', badge: 'dev', action: openRawJsonModal },
+  { id: 'refresh', title: 'Force Refresh Current Room', badge: 'action', action: () => loadRoomMessages(state.currentRoom, true) },
+  { id: 'filter-signed', title: 'Filter Signed Messages Only', badge: 'filter', action: () => { state.filter = 'signed'; if (el.filterSelect) el.filterSelect.value = 'signed'; import('./api.js').then(api => api.renderMessagesFeed()); } },
+  { id: 'filter-all', title: 'Show All Messages', badge: 'filter', action: () => { state.filter = 'all'; if (el.filterSelect) el.filterSelect.value = 'all'; import('./api.js').then(api => api.renderMessagesFeed()); } },
 ];
 
 export function openCommandPalette() {
