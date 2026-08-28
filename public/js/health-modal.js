@@ -1,4 +1,5 @@
 import { state, el } from './store.js';
+import { closeModal } from './ui.js';
 
 export function openHealthModal() {
   const metrics = state.roomMetrics[state.currentRoom];
@@ -145,10 +146,7 @@ export function openHealthModal() {
 
   const closeBtn = document.getElementById('modal-close-btn');
   if (closeBtn) {
-    closeBtn.onclick = () => {
-      el.modalOverlay.classList.add('hidden');
-      el.modalOverlay.classList.remove('flex');
-    };
+    closeBtn.onclick = () => { closeModal(); };
   }
 }
 

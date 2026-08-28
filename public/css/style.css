@@ -297,3 +297,62 @@ body,
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* Modal Exit (Center Scale Out) */
+.modal-exit {
+  animation: modalExit 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes modalExit {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+}
+
+/* Bottom Sheet Slide Down Animation (Mobile) */
+.sheet-exit {
+  animation: sheetSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes sheetSlideDown {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+/* Drawer Slide Right (Exit) Animation */
+.drawer-exit {
+  animation: drawerSlideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes drawerSlideRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+/* Overlay Fade Out */
+.overlay-exit {
+  animation: overlayFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes overlayFadeOut {
+  from { opacity: 1; backdrop-filter: blur(12px); }
+  to { opacity: 0; backdrop-filter: blur(0px); }
+}

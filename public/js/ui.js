@@ -19,6 +19,31 @@ import {
   copyToClipboard,
 } from './utils.js';
 
+
+export function animateClose(overlayEl, contentEl, exitClass) {
+  if (!overlayEl) return;
+  
+  // Guard against double clicks
+  if (overlayEl.classList.contains('overlay-exit')) return;
+
+  overlayEl.classList.remove('overlay-enter');
+  overlayEl.classList.add('overlay-exit');
+  
+  if (contentEl && exitClass) {
+    const enterClass = exitClass.replace('exit', 'enter');
+    contentEl.classList.remove(enterClass);
+    contentEl.classList.add(exitClass);
+  }
+
+  setTimeout(() => {
+    overlayEl.classList.add('hidden');
+    overlayEl.classList.remove('flex', 'overlay-exit');
+    if (contentEl && exitClass) {
+      contentEl.classList.remove(exitClass);
+    }
+  }, 280);
+}
+
 export async function openAgentDrawer(did) {
   if (!el.agentDrawerOverlay || !el.agentDrawerContent) return;
 
@@ -195,10 +220,7 @@ export async function openAgentDrawer(did) {
 }
 
 export function closeAgentDrawer() {
-  if (el.agentDrawerOverlay) {
-    el.agentDrawerOverlay.classList.add('hidden');
-    el.agentDrawerOverlay.classList.remove('flex');
-  }
+  animateClose(el.agentDrawerOverlay, el.agentDrawerContent, 'drawer-exit');
 }
 
 // ==========================================
@@ -301,10 +323,7 @@ export function openProofInspector(msg) {
 }
 
 export function closeModal() {
-  if (el.modalOverlay) {
-    el.modalOverlay.classList.add('hidden');
-    el.modalOverlay.classList.remove('flex');
-  }
+  animateClose(el.modalOverlay, el.modalContainer, 'modal-exit');
 }
 
 // ==========================================
@@ -539,10 +558,7 @@ export function openCryptoStudio() {
 }
 
 export function closeCryptoStudio() {
-  if (el.cryptoStudioOverlay) {
-    el.cryptoStudioOverlay.classList.add('hidden');
-    el.cryptoStudioOverlay.classList.remove('flex');
-  }
+  animateClose(el.cryptoStudioOverlay, el.cryptoStudioContainer, 'modal-exit');
 }
 
 // ==========================================
@@ -617,10 +633,7 @@ export function openCommandPalette() {
 }
 
 export function closeCommandPalette() {
-  if (el.cmdPaletteOverlay) {
-    el.cmdPaletteOverlay.classList.add('hidden');
-    el.cmdPaletteOverlay.classList.remove('flex');
-  }
+  animateClose(el.cmdPaletteOverlay, el.cmdPaletteContainer, 'modal-exit');
 }
 
 export function renderCommandPaletteResults(query = '') {
@@ -691,10 +704,7 @@ export function openMobileRoomsSheet() {
 }
 
 export function closeMobileRoomsSheet() {
-  if (el.mobileRoomsOverlay) {
-    el.mobileRoomsOverlay.classList.add('hidden');
-    el.mobileRoomsOverlay.classList.remove('flex');
-  }
+  animateClose(el.mobileRoomsOverlay, el.mobileRoomsContainer, 'sheet-exit');
 }
 
 export function openMobileMoreSheet() {
@@ -705,8 +715,5 @@ export function openMobileMoreSheet() {
 }
 
 export function closeMobileMoreSheet() {
-  if (el.mobileMoreOverlay) {
-    el.mobileMoreOverlay.classList.add('hidden');
-    el.mobileMoreOverlay.classList.remove('flex');
-  }
+  animateClose(el.mobileMoreOverlay, el.mobileMoreContainer, 'sheet-exit');
 }
