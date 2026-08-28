@@ -463,7 +463,7 @@ export async function loadOlderHistory() {
   const oldestSeq = Math.min(...state.messages.map((m) => m.seq || 0));
 
   try {
-    const url = `/api/rooms/${encodeURIComponent(state.currentRoom)}/history?before=${oldestSeq}&limit=50`;
+    const url = `/api/rooms/${encodeURIComponent(state.currentRoom)}/history?before=${oldestSeq}&limit=200`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
