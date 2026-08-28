@@ -5,6 +5,7 @@ import { showToast } from './toast.js';
 import { openAgentDrawer, openProofInspector, closeAgentDrawer } from './ui.js';
 import { applyUsefulnessFilter } from './filters.js';
 import { runProbes } from './protocol-probes.js';
+import { isBoilerplate } from './farming-patterns.js';
 import { closeMobileRoomsSheet, closeMobileMoreSheet, closeCommandPalette } from './ui.js';
 
 import {
@@ -30,6 +31,7 @@ import {
   formatExactTime,
   calculateChatVelocity,
   copyToClipboard,
+  exportDataAsJson,
 } from './utils.js';
 
 export function getRoomFromUrl() {
@@ -206,6 +208,12 @@ export function renderRoomsList() {
     const filtered = state.rooms.filter((r) => {
       const matchesSearch = r.name.toLowerCase().includes(desktopSearch) || (r.topic && r.topic.toLowerCase().includes(desktopSearch));
       return matchesSearch && matchesTypeFilter(r.name);
+    }).sort((a, b) => {
+      const aPinned = state.pinnedRooms && state.pinnedRooms.has(a.name);
+      const bPinned = state.pinnedRooms && state.pinnedRooms.has(b.name);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      return 0;
     });
 
     if (filtered.length === 0) {
@@ -237,6 +245,12 @@ export function renderRoomsList() {
     const filtered = state.rooms.filter((r) => {
       const matchesSearch = r.name.toLowerCase().includes(mobileSearch) || (r.topic && r.topic.toLowerCase().includes(mobileSearch));
       return matchesSearch && matchesTypeFilter(r.name);
+    }).sort((a, b) => {
+      const aPinned = state.pinnedRooms && state.pinnedRooms.has(a.name);
+      const bPinned = state.pinnedRooms && state.pinnedRooms.has(b.name);
+      if (aPinned && !bPinned) return -1;
+      if (!aPinned && bPinned) return 1;
+      return 0;
     });
 
     if (filtered.length === 0) {
@@ -265,43 +279,81 @@ export function renderRoomsList() {
 
   // Attach click listeners to room buttons
   document.querySelectorAll('.room-nav-btn').forEach((btn) => {
-    btn.onclick = () => {
+    btn.onclick = (e) => {
+      e.preventDefault();
       const room = btn.dataset.room;
       if (room) switchRoom(room);
     };
   });
+
+  // Attach click listeners to pin buttons
+  document.querySelectorAll('.pin-room-btn').forEach((btn) => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const room = btn.dataset.pinRoom;
+      if (!room) return;
+      
+      if (!state.pinnedRooms) state.pinnedRooms = new Set();
+      
+      if (state.pinnedRooms.has(room)) {
+        state.pinnedRooms.delete(room);
+      } else {
+        state.pinnedRooms.add(room);
+      }
+      
+      localStorage.setItem('flopscope_pinned_rooms', JSON.stringify([...state.pinnedRooms]));
+      renderRoomsList();
+    };
+  });
 }
 
-export function createRoomButtonHtml(r) {
+export function createRoomButtonHtml(r, isMobile = false) {
   const isActive = r.name === state.currentRoom;
+  const isPinned = state.pinnedRooms && state.pinnedRooms.has(r.name);
+  
   const activeClass = isActive
     ? 'bg-cyan-500/15 border-cyan-500/40 text-[#00c2ff] font-semibold'
+    : isPinned
+    ? 'bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400 font-medium'
     : 'bg-slate-100 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300';
 
+  const pinIconColor = isPinned ? 'text-amber-500' : 'text-slate-400 opacity-0 group-hover:opacity-100 hover:text-amber-500';
+
   return `
-    <button
-      data-room="${escapeHtml(r.name)}"
-      class="room-nav-btn w-full p-3 rounded-xl border border-slate-200 dark:border-slate-700/80 text-left transition-all duration-150 flex flex-col gap-1.5 ${activeClass}"
-    >
-      <div class="flex items-center justify-between gap-2">
-        <span class="font-mono text-sm tracking-tight truncate flex items-center gap-1.5">
-          <span class="text-cyan-500 dark:text-[#00c2ff] font-bold">/r/</span>${escapeHtml(r.name)}
-        </span>
-        <span class="text-[11px] font-mono text-slate-400 dark:text-slate-500 flex-shrink-0">
-          ${escapeHtml(r.age || 'live')}
-        </span>
-      </div>
-      ${
-        r.topic
-          ? `<p class="text-xs text-slate-500 dark:text-slate-400 truncate">${escapeHtml(r.topic)}</p>`
-          : ''
-      }
-      <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400 dark:text-slate-500 pt-0.5">
-        <span>seq ${r.seq || 0}</span>
-        <span>·</span>
-        <span>${r.size || '0B'}</span>
-      </div>
-    </button>
+    <div class="group relative flex">
+      <button
+        data-room="${escapeHtml(r.name)}"
+        class="room-nav-btn flex-1 p-3 rounded-xl border border-slate-200 dark:border-slate-700/80 text-left transition-all duration-150 flex flex-col gap-1.5 ${activeClass}"
+      >
+        <div class="flex items-center justify-between gap-2">
+          <span class="font-mono text-sm tracking-tight truncate flex items-center gap-1.5 pr-6">
+            <span class="${isActive ? 'text-cyan-500 dark:text-[#00c2ff]' : 'text-slate-400 dark:text-slate-500'} font-bold">/r/</span>${escapeHtml(r.name)}
+          </span>
+          <span class="text-[11px] font-mono text-slate-400 dark:text-slate-500 flex-shrink-0">
+            ${escapeHtml(r.age || 'live')}
+          </span>
+        </div>
+        ${
+          r.topic
+            ? `<p class="text-xs text-slate-500 dark:text-slate-400 truncate">${escapeHtml(r.topic)}</p>`
+            : ''
+        }
+        <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400 dark:text-slate-500 pt-0.5">
+          <span>seq ${r.seq || 0}</span>
+        </div>
+      </button>
+      
+      <button 
+        data-pin-room="${escapeHtml(r.name)}" 
+        class="pin-room-btn absolute right-2 top-2 p-1.5 rounded-lg transition-all z-10 ${pinIconColor}" 
+        title="${isPinned ? 'Unpin Room' : 'Pin Room'}"
+      >
+        <svg class="w-4 h-4" fill="${isPinned ? 'currentColor' : 'none'}" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+        </svg>
+      </button>
+    </div>
   `;
 }
 
@@ -371,7 +423,8 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
       const incomingHighestSeq = Math.max(...incomingMessages.map((m) => m.seq || 0));
 
       if (incomingHighestSeq > currentHighestSeq) {
-        const newCount = incomingMessages.filter((m) => (m.seq || 0) > currentHighestSeq).length;
+        const newMessages = incomingMessages.filter((m) => (m.seq || 0) > currentHighestSeq);
+        const newCount = newMessages.length;
         const isNearTop = window.scrollY < 200;
 
         if (!isNearTop) {
@@ -379,6 +432,24 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
           if (el.newMessagesPill && el.newMessagesCount) {
             el.newMessagesCount.textContent = `${state.unseenNewMessagesCount} new message${state.unseenNewMessagesCount > 1 ? 's' : ''}`;
             el.newMessagesPill.classList.remove('hidden');
+          }
+        }
+
+        // Check for Watched DIDs
+        if (state.watchedDids && state.watchedDids.size > 0) {
+          for (const msg of newMessages) {
+            const did = msg.from || msg.did;
+            if (did && state.watchedDids.has(did) && !isBoilerplate(msg.text || '')) {
+              const shortDid = truncateDid(did);
+              const txt = (msg.text || '').substring(0, 40) + '...';
+              showToast(`👀 ${shortDid} posted: "${txt}"`);
+              if (Notification.permission === 'granted') {
+                new Notification(`Watched DID: ${shortDid}`, {
+                  body: msg.text || '',
+                  icon: '/favicon.ico'
+                });
+              }
+            }
           }
         }
       }
@@ -839,11 +910,21 @@ export function renderMessagesFeed() {
     `;
   }
 
+  if (el.filterCount) {
+    el.filterCount.innerText = `Showing ${filtered.length} of ${state.messages.length}`;
+  }
+
+  if (el.exportBtn) {
+    el.exportBtn.onclick = () => {
+      exportDataAsJson(filtered, `flopscope_${state.currentRoom}_export.json`);
+    };
+  }
+
   if (filtered.length === 0) {
     html += `
       <div class="text-center py-16 px-4 rounded-2xl glass-panel text-slate-400 font-mono text-sm space-y-2">
-        <svg class="w-8 h-8 text-slate-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        <svg class="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p class="font-bold text-slate-600 dark:text-slate-300">No messages match your criteria</p>
         <p class="text-xs text-slate-500">Try clearing your search query or changing filter options</p>

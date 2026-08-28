@@ -11,7 +11,9 @@ export const state = {
   searchQuery: '',
   roomTypeFilter: 'all',
   sortOrder: 'desc',
-  usefulnessFilter: 'all',
+  usefulnessFilter: (typeof localStorage !== 'undefined' && localStorage.getItem('flopscope_usefulness_filter')) || 'all',
+  watchedDids: new Set(JSON.parse((typeof localStorage !== 'undefined' && localStorage.getItem('flopscope_watched_dids')) || '[]')),
+  pinnedRooms: new Set(JSON.parse((typeof localStorage !== 'undefined' && localStorage.getItem('flopscope_pinned_rooms')) || '[]')),
   protocolHealth: null,       // Updated by runProbes() after each successful poll
   lastPollMessageCount: null, // Tracks new messages per poll for velocity-sanity probe
   verificationCache: new Map(),
@@ -73,9 +75,11 @@ export function initElements() {
   el.clearSearchBtn = document.getElementById("clear-search-btn");
   el.filterSelect = document.getElementById('filter-select');
   el.usefulnessFilterSelect = document.getElementById('usefulness-filter-select');
+  el.filterCount = document.getElementById('filter-count');
   el.sortBtn = document.getElementById('sort-btn');
   el.sortIcon = document.getElementById('sort-icon');
   el.sortLabel = document.getElementById('sort-label');
+  el.exportBtn = document.getElementById('export-btn');
 
   // Stream & Pill
   el.newMessagesPillContainer = document.getElementById('new-messages-pill-container');

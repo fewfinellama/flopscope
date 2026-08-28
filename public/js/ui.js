@@ -72,6 +72,10 @@ export async function openAgentDrawer(did) {
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
               <span>Filter Feed</span>
             </button>
+            <button id="drawer-watch-did-btn" class="btn-interactive px-3 py-1.5 ${state.watchedDids.has(did) ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border-indigo-200 dark:border-indigo-800/80' : 'bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800'} border rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+              <span>${state.watchedDids.has(did) ? 'Watching' : 'Watch'}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -102,6 +106,21 @@ export async function openAgentDrawer(did) {
     // and ui.js can't easily import it without circular dependencies if we aren't careful,
     // we can just dispatch a custom event.
     window.dispatchEvent(new CustomEvent('did-filter-updated'));
+  };
+
+  document.getElementById('drawer-watch-did-btn').onclick = () => {
+    if (state.watchedDids.has(did)) {
+      state.watchedDids.delete(did);
+      showToast('Stopped watching DID');
+    } else {
+      state.watchedDids.add(did);
+      showToast('Watching DID');
+      if (Notification.permission === 'default') {
+        Notification.requestPermission();
+      }
+    }
+    localStorage.setItem('flopscope_watched_dids', JSON.stringify([...state.watchedDids]));
+    openAgentDrawer(did); // re-render to update button state
   };
 
   // Fetch Agent Profile from Server

@@ -125,6 +125,14 @@
         <span>Refresh</span>
       </button>
 
+      <!-- Export Data Button -->
+      <button id="export-btn" class="btn-interactive px-3.5 py-2 bg-slate-100 dark:bg-slate-900/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-mono font-medium flex items-center gap-1.5 shadow-sm" title="Export Current Feed (JSON)">
+        <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        <span class="hidden sm:inline">Export</span>
+      </button>
+
       <!-- Raw JSON Modal Button -->
       <button id="raw-json-btn" class="btn-interactive px-3 py-2 bg-slate-100 dark:bg-slate-900/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-mono font-medium flex items-center gap-1.5 shadow-sm" title="View Raw API JSON">
         <svg class="w-4 h-4 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -393,6 +401,11 @@
             <option value="has-code" class="bg-white dark:bg-slate-900">{ } Has Code / JSON</option>
             <option value="protocol" class="bg-white dark:bg-slate-900">⚡ Protocol Only</option>
           </select>
+
+          <!-- Filter Message Count -->
+          <div id="filter-count" class="hidden sm:flex items-center px-3 py-2 text-xs font-mono font-medium text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-slate-800/50">
+            <!-- Count goes here -->
+          </div>
 
           <!-- Sort Toggle Button -->
           <button id="sort-btn" class="btn-interactive px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950/80 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs sm:text-sm font-mono text-slate-700 dark:text-slate-300 flex items-center gap-1.5 transition touch-target">

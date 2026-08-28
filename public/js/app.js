@@ -35,6 +35,7 @@ import {
   openMobileMoreSheet,
   closeMobileMoreSheet
 } from './ui.js';
+import { exportDataAsJson } from './utils.js';
 
 function setupPolling() {
   if (state.pollingTimer) {
@@ -280,8 +281,10 @@ function initEventListeners() {
   }
 
   if (el.usefulnessFilterSelect) {
+    el.usefulnessFilterSelect.value = state.usefulnessFilter;
     el.usefulnessFilterSelect.onchange = (e) => {
       state.usefulnessFilter = e.target.value;
+      localStorage.setItem('flopscope_usefulness_filter', e.target.value);
       renderMessagesFeed();
     };
   }
