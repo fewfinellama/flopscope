@@ -134,11 +134,6 @@ export async function openAgentDrawer(did) {
       `;
     }
 
-             </div>
-          </div>
-        </div>
-      `;
-    }
 
       const pubKeyBytes = decodeDidKey(did);
       pubKeyHex = bytesToHex(pubKeyBytes);
