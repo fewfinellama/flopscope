@@ -105,7 +105,9 @@ function initEventListeners() {
   // Theme Toggles
   if (el.themeToggleBtn) el.themeToggleBtn.onclick = toggleTheme;
   if (el.mobileThemeToggleBtn) el.mobileThemeToggleBtn.onclick = toggleTheme;
+  if (el.mobileThemeToggleBtn) el.mobileThemeToggleBtn.onclick = toggleTheme;
   if (el.densityToggleBtn) el.densityToggleBtn.onclick = toggleDensity;
+  if (el.mobileDensityToggleBtn) el.mobileDensityToggleBtn.onclick = toggleDensity;
   if (el.mobileDensityToggleBtn) el.mobileDensityToggleBtn.onclick = toggleDensity;
 
   // Refresh Buttons
