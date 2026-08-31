@@ -421,6 +421,7 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
     // Cache status badge update
     updateCacheBadge(json.cached, json.ageMs);
 
+    let newlyFetched = null;
     // Check for unseen new messages if user is scrolled down
     if (!isInitial && state.messages.length > 0 && incomingMessages.length > 0) {
       const currentHighestSeq = Math.max(...state.messages.map((m) => m.seq || 0));
@@ -428,6 +429,7 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
 
       if (incomingHighestSeq > currentHighestSeq) {
         const newMessages = incomingMessages.filter((m) => (m.seq || 0) > currentHighestSeq);
+        newlyFetched = newMessages;
         const newCount = newMessages.length;
         const isNearTop = window.scrollY < 200;
 
@@ -465,8 +467,8 @@ export async function loadRoomMessages(roomName = state.currentRoom, forceRefres
     // Update stats counters
     updateRoomStats();
 
-    // Render feed
-    renderMessagesFeed();
+    // Render feed incrementally if possible
+    renderMessagesFeed(newlyFetched);
 
     // Trigger background signature verifications
     verifyAllPendingSignatures();
@@ -912,20 +914,14 @@ export function updateMessageVerificationBadge(seq, result) {
 // ==========================================
 // FEED RENDERING & FILTERING
 // ==========================================
-export function renderMessagesFeed() {
+export function renderMessagesFeed(newlyFetched = null) {
   if (!el.messagesContainer) return;
 
   const query = (state.searchQuery || '').toLowerCase().trim();
   const filter = state.filter;
 
-  // Filter messages
-  let filtered = state.messages.filter((m) => {
-    // 0. DID Specific Filter
-    if (state.filterDid && m.from !== state.filterDid) {
-      return false;
-    }
-
-    // 1. Text & DID Search
+  const filterFn = (m) => {
+    if (state.filterDid && m.from !== state.filterDid) return false;
     if (query) {
       const matchText = (m.rawText || m.text || '').toLowerCase().includes(query);
       const fullFrom = (m.from || '').toLowerCase();
@@ -935,42 +931,47 @@ export function renderMessagesFeed() {
       const matchNonce = m.nonce ? String(m.nonce).toLowerCase().includes(query) : false;
       if (!matchText && !matchFrom && !matchSeq && !matchNonce) return false;
     }
-
-    // 2. Type Filter
     const isSigned = m.from && m.from.startsWith('did:key:z6Mk');
     const verif = state.verificationCache.get(`${state.currentRoom}:${m.seq}`);
-
     if (filter === 'signed' && !isSigned) return false;
     if (filter === 'unsigned' && isSigned) return false;
     if (filter === 'verified' && (!verif || !verif.valid)) return false;
-
     return true;
-  });
+  };
 
-  // 3. Usefulness filter (pure pass — URL / code / high-signal / protocol)
-  filtered = applyUsefulnessFilter(filtered, state.usefulnessFilter);
+  // INCREMENTAL RENDER (Performance Optimization)
+  if (newlyFetched && el.messagesContainer.children.length > 0 && !el.messagesContainer.querySelector('.text-center.py-16')) {
+    let newFiltered = newlyFetched.filter(filterFn);
+    newFiltered = applyUsefulnessFilter(newFiltered, filter);
+    newFiltered.sort((a, b) => b.seq - a.seq);
 
-  // Sort messages
-  filtered.sort((a, b) => {
-    const seqA = a.seq || 0;
-    const seqB = b.seq || 0;
-    return state.sortOrder === 'desc' ? seqB - seqA : seqA - seqB;
-  });
-
-  let html = '';
-
-  if (state.filterDid) {
-    html += `
-      <div class="mb-4 p-3 rounded-xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800/80 flex items-center justify-between text-xs font-mono shadow-sm">
-        <div class="flex items-center gap-2 overflow-hidden">
-          <svg class="w-4 h-4 text-cyan-600 dark:text-[#00c2ff] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
-          <span class="text-slate-600 dark:text-slate-400 font-semibold truncate">Filtering by: <span class="text-cyan-700 dark:text-[#00c2ff] font-bold select-all">${state.filterDid}</span></span>
-        </div>
-        <button id="clear-did-filter-btn" class="flex-shrink-0 px-2.5 py-1 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg transition-colors font-bold tracking-tight">Clear</button>
-      </div>
-    `;
+    if (newFiltered.length > 0) {
+      let newHtml = '';
+      for (const m of newFiltered) {
+        newHtml += createMessageCardHtml(m);
+      }
+      el.messagesContainer.insertAdjacentHTML('afterbegin', newHtml);
+      
+      const domLimit = 500;
+      while (el.messagesContainer.children.length > domLimit) {
+        el.messagesContainer.lastElementChild.remove();
+      }
+      attachCardEventListeners();
+    }
+    
+    // Update filter count header
+    const currentlyRendered = el.messagesContainer.querySelectorAll('.message-card').length;
+    if (el.filterCount) {
+      el.filterCount.innerText = `Showing ${currentlyRendered} of ${state.messages.length}`;
+    }
+    return;
   }
 
+  // FULL RENDER
+  let filtered = state.messages.filter(filterFn);
+  filtered = applyUsefulnessFilter(filtered, filter);
+
+  // Update headers
   if (el.filterCount) {
     el.filterCount.innerText = `Showing ${filtered.length} of ${state.messages.length}`;
   }
@@ -981,6 +982,7 @@ export function renderMessagesFeed() {
     };
   }
 
+  let html = '';
   if (filtered.length === 0) {
     html += `
       <div class="text-center py-16 px-4 rounded-2xl glass-panel text-slate-400 font-mono text-sm space-y-2">
@@ -995,7 +997,6 @@ export function renderMessagesFeed() {
     return;
   }
 
-  // Cap DOM rendering at 500 messages to prevent UI freezing (Performance Tuning)
   const domLimit = 500;
   html += filtered.slice(0, domLimit).map((m) => createMessageCardHtml(m)).join('');
   if (filtered.length > domLimit) {
@@ -1003,7 +1004,6 @@ export function renderMessagesFeed() {
   }
   el.messagesContainer.innerHTML = html;
 
-  // Attach clear listener if button exists
   const clearBtn = document.getElementById('clear-did-filter-btn');
   if (clearBtn) {
     clearBtn.onclick = () => {
@@ -1012,7 +1012,6 @@ export function renderMessagesFeed() {
     };
   }
 
-  // Attach interactive listeners to dynamically created cards
   attachCardEventListeners();
 }
 
@@ -1066,7 +1065,7 @@ export function createMessageCardHtml(msg) {
     `;
 
   // Sender Name & Action
-  const senderDisplay = isSigned ? truncateDid(msg.from) : escapeHtml(msg.from || 'anonymous');
+  const senderDisplay = isSigned ? escapeHtml(truncateDid(msg.from)) : escapeHtml(msg.from || 'anonymous');
 
   // Relative Time & Exact Time Tooltip
   const relTime = formatRelativeTime(msg.ts);
