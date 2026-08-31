@@ -132,19 +132,29 @@ app.get('/api/rooms', async (req, res, next) => {
     }
   }
 
-  try {
-    const rooms = await proxy.fetchRooms();
-    cache.set(cacheKey, rooms, CACHE_TTL_MS);
+  let lastErr = null;
+  const maxRetries = 2;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const rooms = await proxy.fetchRooms();
+      cache.set(cacheKey, rooms, CACHE_TTL_MS);
 
-    res.json({
-      cached: false,
-      ageMs: 0,
-      count: rooms.length,
-      data: rooms,
-    });
-  } catch (err) {
-    next(err);
+      return res.json({
+        cached: false,
+        ageMs: 0,
+        count: rooms.length,
+        data: rooms,
+      });
+    } catch (err) {
+      lastErr = err;
+      if (attempt < maxRetries) {
+        await new Promise((r) => setTimeout(r, 500));
+      }
+    }
   }
+  
+  next(lastErr);
 });
 
 /**

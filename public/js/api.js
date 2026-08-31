@@ -162,32 +162,47 @@ export function highlightActiveRoom(roomName) {
 // ROOMS DIRECTORY FETCH & RENDER
 // ==========================================
 export async function fetchRoomsList(forceRefresh = false) {
-  try {
-    const url = `/api/rooms${forceRefresh ? '?refresh=true' : ''}`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
+  const MAX_RETRIES = 2;
+  let lastErr = null;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const url = `/api/rooms${forceRefresh ? '?refresh=true' : ''}`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
 
         state.rooms = Array.isArray(json.data) ? json.data : [];
 
-    // Ensure the current jumped room doesn't vanish on poll if it's dead
-    if (state.currentRoom && !state.rooms.find(r => r.name === state.currentRoom)) {
-      state.rooms.unshift({ name: state.currentRoom, topic: 'Discovered via Jump', active: true });
-    }
+      // Ensure the current jumped room doesn't vanish on poll if it's dead
+      if (state.currentRoom && !state.rooms.find(r => r.name === state.currentRoom)) {
+        state.rooms.unshift({ name: state.currentRoom, topic: 'Discovered via Jump', active: true });
+      }
 
-    if (el.roomsCountBadge) {
-      el.roomsCountBadge.textContent = `${state.rooms.length} Active`;
-    }
-    if (el.mobileRoomsCount) {
-      el.mobileRoomsCount.textContent = `${state.rooms.length} Active`;
-    }
+      if (el.roomsCountBadge) {
+        el.roomsCountBadge.textContent = `${state.rooms.length} Active`;
+      }
+      if (el.mobileRoomsCount) {
+        el.mobileRoomsCount.textContent = `${state.rooms.length} Active`;
+      }
 
-    renderRoomsList();
-    updateRoomHeaderInfo(state.currentRoom);
-  } catch (err) {
-    console.error('Failed to fetch rooms:', err);
+      renderRoomsList();
+      updateRoomHeaderInfo(state.currentRoom);
+      return; // success — exit retry loop
+    } catch (err) {
+      lastErr = err;
+      if (attempt < MAX_RETRIES) {
+        await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
+      }
+    }
   }
+
+  // All retries failed — log quietly and show non-alarming status
+  console.warn('Upstream temporarily unavailable for rooms list:', lastErr?.message);
+  if (el.roomsCountBadge) el.roomsCountBadge.textContent = 'Unavailable';
+  if (el.mobileRoomsCount) el.mobileRoomsCount.textContent = 'Unavailable';
 }
+
 
 export function renderRoomsList() {
   const desktopSearch = (el.roomSearchInput ? el.roomSearchInput.value : '').toLowerCase().trim();
